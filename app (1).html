@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyGenie — Ask a Question</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #1a9e6e; --green-light: #e6f7f1; --green-dark: #0d6b4a;
+    --yellow: #f5c842; --yellow-light: #fffbe6;
+    --text: #0f1117; --text-muted: #6b7280;
+    --border: #e5e7eb; --bg: #f9fafb; --white: #ffffff;
+    --font-head: 'Sora', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+  nav { background: var(--white); border-bottom: 1px solid var(--border); height: 60px; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; flex-shrink: 0; }
+  .logo { font-family: var(--font-head); font-size: 19px; font-weight: 800; color: var(--green); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+  .logo-mark { width: 32px; height: 32px; background: var(--green); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .credits-badge { background: var(--yellow-light); border: 1px solid var(--yellow); border-radius: 20px; padding: 5px 13px; font-size: 13px; font-weight: 500; color: #92700a; }
+  .btn-upgrade { background: var(--green); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+  .btn-upgrade:hover { background: var(--green-dark); }
+  .btn-home { background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px; padding: 7px 14px; font-family: var(--font-body); font-size: 13px; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+  .btn-home:hover { border-color: var(--green); color: var(--green); }
+
+  .layout { display: flex; flex: 1; overflow: hidden; }
+
+  .sidebar { width: 220px; background: var(--white); border-right: 1px solid var(--border); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex-shrink: 0; }
+  .sidebar-label { font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; padding: 0 8px; margin: 10px 0 4px; }
+  .s-btn { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 9px; border: none; background: transparent; cursor: pointer; font-family: var(--font-body); font-size: 13.5px; color: var(--text); transition: background 0.12s; text-align: left; width: 100%; }
+  .s-btn:hover { background: var(--bg); }
+  .s-btn.active { background: var(--green-light); color: var(--green-dark); font-weight: 500; }
+  .s-icon { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+  .hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; text-align: center; }
+  .hero-icon { width: 64px; height: 64px; background: var(--green-light); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 18px; }
+  .hero h1 { font-family: var(--font-head); font-size: 26px; font-weight: 800; line-height: 1.25; margin-bottom: 10px; }
+  .hero p { font-size: 15px; color: var(--text-muted); max-width: 420px; line-height: 1.6; margin-bottom: 28px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 560px; }
+  .chip { background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: 7px 15px; font-size: 13px; color: var(--text); cursor: pointer; transition: all 0.15s; font-family: var(--font-body); }
+  .chip:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+
+  .chat-area { flex: 1; overflow-y: auto; padding: 20px 24px; display: none; flex-direction: column; gap: 18px; }
+  .chat-area.active { display: flex; }
+
+  .msg { display: flex; gap: 10px; max-width: 740px; width: 100%; margin: 0 auto; }
+  .msg.user { flex-direction: row-reverse; }
+  .m-av { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; font-weight: 700; font-family: var(--font-head); }
+  .m-av.ai { background: var(--green); color: white; }
+  .m-av.u { background: #e0e7ff; color: #4338ca; }
+  .bubble { border-radius: 14px; padding: 13px 17px; font-size: 14px; line-height: 1.7; max-width: calc(100% - 42px); }
+  .bubble.ai { background: var(--white); border: 1px solid var(--border); color: var(--text); }
+  .bubble.user { background: var(--green); color: white; border-radius: 14px 14px 4px 14px; }
+  .bubble h3 { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--green-dark); }
+  .step-block { background: var(--green-light); border-left: 3px solid var(--green); border-radius: 0 8px 8px 0; padding: 9px 12px; margin: 7px 0; font-size: 13.5px; line-height: 1.6; }
+  .step-label { font-weight: 700; color: var(--green-dark); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+  .formula-box { background: #f3f0ff; border: 1px solid #c4b5fd; border-radius: 8px; padding: 9px 14px; font-family: 'Courier New', monospace; font-size: 14px; color: #5b21b6; margin: 7px 0; text-align: center; }
+  .dots { display: flex; gap: 5px; align-items: center; }
+  .dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: bop 1.2s infinite; display: inline-block; }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bop { 0%,80%,100%{transform:translateY(0);opacity:0.4}40%{transform:translateY(-6px);opacity:1} }
+
+  .input-zone { border-top: 1px solid var(--border); padding: 14px 20px; background: var(--white); flex-shrink: 0; }
+  .input-inner { max-width: 740px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+  .input-row { display: flex; gap: 8px; align-items: flex-end; }
+  textarea { flex: 1; border: 1.5px solid var(--border); border-radius: 12px; padding: 11px 15px; font-family: var(--font-body); font-size: 14px; color: var(--text); resize: none; outline: none; height: 50px; max-height: 130px; background: var(--bg); transition: border-color 0.15s; line-height: 1.5; }
+  textarea:focus { border-color: var(--green); background: var(--white); }
+  textarea::placeholder { color: #9ca3af; }
+  .send { width: 46px; height: 46px; background: var(--green); border: none; border-radius: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .send:hover { background: var(--green-dark); }
+  .send:active { transform: scale(0.95); }
+  .send:disabled { background: #d1d5db; cursor: not-allowed; }
+  .send svg { width: 18px; height: 18px; fill: white; }
+  .foot-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
+  .foot-row span { color: var(--green); font-weight: 500; }
+
+  /* MODAL */
+  .modal-wrap { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+  .modal-wrap.open { display: flex; }
+  .modal { background: var(--white); border-radius: 20px; padding: 28px; max-width: 500px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto; }
+  .modal-x { position: absolute; top: 14px; right: 14px; background: var(--bg); border: none; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; font-size: 17px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; }
+  .modal h2 { font-family: var(--font-head); font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+  .modal > p { font-size: 14px; color: var(--text-muted); margin-bottom: 18px; }
+  .free-row { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 13px; }
+  .free-row strong { color: var(--text); }
+  .plans { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+  .p-card { border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 12px; cursor: pointer; transition: all 0.15s; position: relative; }
+  .p-card:hover { border-color: var(--green); }
+  .p-card.sel { border-color: var(--green); background: var(--green-light); }
+  .p-card.pop { border-color: var(--green); }
+  .pop-tag { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--green); color: white; font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; letter-spacing: 0.05em; }
+  .p-tier { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 3px; }
+  .p-name { font-family: var(--font-head); font-size: 13px; font-weight: 800; margin-bottom: 5px; }
+  .p-price { font-family: var(--font-head); font-size: 18px; font-weight: 800; color: var(--green-dark); margin-bottom: 8px; }
+  .p-price small { font-size: 10px; font-weight: 400; color: var(--text-muted); }
+  .p-feats { list-style: none; font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 3px; }
+  .p-feats li::before { content: "✓ "; color: var(--green); font-weight: 700; }
+  .pay-btn { display: block; width: 100%; background: var(--green); color: white; border: none; border-radius: 10px; padding: 13px; font-family: var(--font-head); font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 14px; transition: background 0.15s; }
+  .pay-btn:hover { background: var(--green-dark); }
+  .pay-note { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo"><div class="logo-mark">✦</div>StudyGenie</a>
+  <div class="nav-right">
+    <div class="credits-badge">⚡ <span id="cr">5</span> free left</div>
+    <button class="btn-upgrade" onclick="openModal()">Upgrade — from PKR 500</button>
+    <a href="index.html" class="btn-home">← Home</a>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-label">Subject</div>
+    <button class="s-btn active" onclick="setSub(this,'Mathematics')"><div class="s-icon" style="background:#fef3c7">📐</div>Mathematics</button>
+    <button class="s-btn" onclick="setSub(this,'Physics')"><div class="s-icon" style="background:#e0f2fe">⚛️</div>Physics</button>
+    <button class="s-btn" onclick="setSub(this,'Chemistry')"><div class="s-icon" style="background:#f0fdf4">🧪</div>Chemistry</button>
+    <button class="s-btn" onclick="setSub(this,'Biology')"><div class="s-icon" style="background:#fdf4ff">🧬</div>Biology</button>
+    <button class="s-btn" onclick="setSub(this,'English')"><div class="s-icon" style="background:#fff7ed">📝</div>English</button>
+    <button class="s-btn" onclick="setSub(this,'Urdu')"><div class="s-icon" style="background:#fef2f2">📖</div>Urdu</button>
+    <button class="s-btn" onclick="setSub(this,'Computer Science')"><div class="s-icon" style="background:#eff6ff">💻</div>Computer Sci</button>
+    <button class="s-btn" onclick="setSub(this,'Economics')"><div class="s-icon" style="background:#f0fdf4">📊</div>Economics</button>
+    <button class="s-btn" onclick="setSub(this,'Pakistan Studies')"><div class="s-icon" style="background:#fef9c3">🏛️</div>Pak Studies</button>
+    <button class="s-btn" onclick="setSub(this,'Islamiyat')"><div class="s-icon" style="background:#ecfdf5">☪️</div>Islamiyat</button>
+
+    <div class="sidebar-label">Level</div>
+    <button class="s-btn active" onclick="setLvl(this,'Matric')">🏫 Matric</button>
+    <button class="s-btn" onclick="setLvl(this,'Intermediate')">🎓 Intermediate</button>
+    <button class="s-btn" onclick="setLvl(this,'O-Levels')">🌍 O-Levels</button>
+    <button class="s-btn" onclick="setLvl(this,'A-Levels')">🏆 A-Levels</button>
+  </aside>
+
+  <main class="main">
+    <div class="hero" id="hero">
+      <div class="hero-icon">🎓</div>
+      <h1>Your AI study assistant<br>for Pakistani students</h1>
+      <p>Paste any question from your syllabus and get a clear, step-by-step answer instantly. Available 24/7.</p>
+      <div class="chips">
+        <button class="chip" onclick="useChip(this)">Solve: 2x² + 5x - 3 = 0</button>
+        <button class="chip" onclick="useChip(this)">Explain Newton's 3rd Law</button>
+        <button class="chip" onclick="useChip(this)">What is photosynthesis?</button>
+        <button class="chip" onclick="useChip(this)">Ionic vs covalent bonds</button>
+        <button class="chip" onclick="useChip(this)">What is GDP?</button>
+        <button class="chip" onclick="useChip(this)">Explain the water cycle</button>
+      </div>
+    </div>
+
+    <div class="chat-area" id="chat"></div>
+
+    <div class="input-zone">
+      <div class="input-inner">
+        <div class="input-row">
+          <textarea id="q" placeholder="Type or paste your question here..." onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+          <button class="send" id="send" onclick="ask()">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+        <div class="foot-row">
+          <span style="color:var(--text-muted)">Subject: <span id="sub-label">Mathematics</span> · Level: <span id="lvl-label">Matric</span></span>
+          <span><span id="cr2">5</span> questions left today</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-wrap" id="modal" onclick="outsideClose(event)">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <h2>Upgrade StudyGenie</h2>
+    <p>Unlock more questions and premium features</p>
+    <div class="free-row"><strong>Free</strong><span>5 questions/day · Always free</span></div>
+    <div class="plans">
+      <div class="p-card" id="pc-starter" onclick="pickPlan('starter')">
+        <div class="p-tier">Beginner</div>
+        <div class="p-name">Starter</div>
+        <div class="p-price">PKR 500<small>/mo</small></div>
+        <ul class="p-feats"><li>20 q/day</li><li>All subjects</li><li>All levels</li></ul>
+      </div>
+      <div class="p-card pop sel" id="pc-scholar" onclick="pickPlan('scholar')">
+        <div class="pop-tag">POPULAR</div>
+        <div class="p-tier">Intermediate</div>
+        <div class="p-name">Scholar</div>
+        <div class="p-price">PKR 750<small>/mo</small></div>
+        <ul class="p-feats"><li>50 q/day</li><li>All subjects</li><li>Priority speed</li></ul>
+      </div>
+      <div class="p-card" id="pc-pro" onclick="pickPlan('pro')">
+        <div class="p-tier">Advanced</div>
+        <div class="p-name">Pro</div>
+        <div class="p-price">PKR 999<small>/mo</small></div>
+        <ul class="p-feats"><li>Unlimited</li><li>Urdu mode</li><li>Past papers</li></ul>
+      </div>
+    </div>
+    <button class="pay-btn" id="pay-btn" onclick="pay()">Get Scholar — PKR 750/mo →</button>
+    <p class="pay-note">🔒 Secure via Paddle · Visa · Mastercard · JazzCash · EasyPaisa</p>
+  </div>
+</div>
+
+<script>
+  let credits = 5, sub = 'Mathematics', lvl = 'Matric', busy = false, started = false, plan = 'scholar';
+  const planInfo = { starter:{n:'Starter',p:'PKR 500'}, scholar:{n:'Scholar',p:'PKR 750'}, pro:{n:'Pro',p:'PKR 999'} };
+
+  function setSub(btn, s) {
+    document.querySelectorAll('.sidebar .s-btn').forEach(b => { if(!['Matric','Intermediate','O-Levels','A-Levels'].some(l=>b.textContent.includes(l))) b.classList.remove('active'); });
+    btn.classList.add('active'); sub = s; document.getElementById('sub-label').textContent = s;
+  }
+  function setLvl(btn, l) {
+    document.querySelectorAll('.sidebar .s-btn').forEach(b => { if(['Matric','Intermediate','O-Levels','A-Levels'].some(x=>b.textContent.includes(x))) b.classList.remove('active'); });
+    btn.classList.add('active'); lvl = l; document.getElementById('lvl-label').textContent = l;
+  }
+  function useChip(btn) { document.getElementById('q').value = btn.textContent; ask(); }
+  function resize(el) { el.style.height='50px'; el.style.height=Math.min(el.scrollHeight,130)+'px'; }
+  function onKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask();} }
+
+  function addMsg(role, html) {
+    const chat = document.getElementById('chat');
+    const d = document.createElement('div'); d.className = `msg ${role}`;
+    const av = document.createElement('div'); av.className = `m-av ${role==='ai'?'ai':'u'}`; av.textContent = role==='ai'?'✦':'U';
+    const b = document.createElement('div'); b.className = `bubble ${role==='ai'?'ai':'user'}`;
+    if(role==='ai') b.innerHTML=html; else b.textContent=html;
+    d.appendChild(av); d.appendChild(b); chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
+    return b;
+  }
+
+  function addLoader() {
+    const chat=document.getElementById('chat');
+    const d=document.createElement('div'); d.className='msg ai'; d.id='loader';
+    const av=document.createElement('div'); av.className='m-av ai'; av.textContent='✦';
+    const b=document.createElement('div'); b.className='bubble ai';
+    b.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+    d.appendChild(av); d.appendChild(b); chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
+  }
+  function removeLoader() { const el=document.getElementById('loader'); if(el) el.remove(); }
+
+  async function ask() {
+    if(busy) return;
+    const inp = document.getElementById('q');
+    const q = inp.value.trim();
+    if(!q) return;
+    if(credits<=0) { openModal(); return; }
+
+    credits--;
+    document.getElementById('cr').textContent=credits;
+    document.getElementById('cr2').textContent=credits;
+    inp.value=''; inp.style.height='50px';
+
+    if(!started) {
+      document.getElementById('hero').style.display='none';
+      document.getElementById('chat').classList.add('active');
+      started=true;
+    }
+
+    addMsg('user', q);
+    addLoader();
+    busy=true;
+    document.getElementById('send').disabled=true;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q, subject: sub, level: lvl })
+      });
+      const data = await res.json();
+      removeLoader();
+      addMsg('ai', data.answer || 'Sorry, something went wrong. Please try again.');
+    } catch(e) {
+      removeLoader();
+      addMsg('ai','<p>Connection error. Please check your internet and try again.</p>');
+    }
+
+    busy=false;
+    document.getElementById('send').disabled=false;
+
+    if(credits===0) {
+      setTimeout(()=>{ addMsg('ai','<h3>You\'ve used all 5 free questions!</h3><p>Upgrade to keep studying. Plans start from just <strong>PKR 500/month</strong> — click Upgrade above!</p>'); },800);
+    }
+  }
+
+  function pickPlan(p) {
+    plan=p;
+    document.querySelectorAll('.p-card').forEach(c=>c.classList.remove('sel'));
+    document.getElementById('pc-'+p).classList.add('sel');
+    document.getElementById('pay-btn').textContent=`Get ${planInfo[p].n} — ${planInfo[p].p}/mo →`;
+  }
+
+  function openModal() { document.getElementById('modal').classList.add('open'); }
+  function closeModal() { document.getElementById('modal').classList.remove('open'); }
+  function outsideClose(e) { if(e.target===document.getElementById('modal')) closeModal(); }
+
+  function pay() {
+    closeModal();
+    addMsg('ai',`<h3>Payment coming very soon!</h3><p>You selected <strong>${planInfo[plan].n} (${planInfo[plan].p}/mo)</strong>. We're integrating Paddle so you can pay via Visa, Mastercard, JazzCash, or EasyPaisa — all in PKR. We'll notify you the moment it's live!</p>`);
+  }
+</script>
+</body>
+</html>
