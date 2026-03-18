@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyGenie — AI Study Assistant for Pakistani Students</title>
+<meta name="description" content="Get step-by-step answers for Matric, Inter, O-Levels and A-Levels. Your 24/7 AI tutor, built for Pakistani students.">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #1a9e6e;
+    --green-light: #e6f7f1;
+    --green-mid: #12b67a;
+    --green-dark: #0d6b4a;
+    --yellow: #f5c842;
+    --yellow-light: #fffbe6;
+    --text: #0f1117;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f9fafb;
+    --white: #ffffff;
+    --font-head: 'Sora', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-body); color: var(--text); background: var(--white); overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    height: 64px;
+    display: flex; align-items: center;
+    padding: 0 5%;
+    justify-content: space-between;
+  }
+  .logo { font-family: var(--font-head); font-size: 22px; font-weight: 800; color: var(--green); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-mark { width: 36px; height: 36px; background: var(--green); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a { font-size: 15px; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta { background: var(--green); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-family: var(--font-body); font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.15s; }
+  .nav-cta:hover { background: var(--green-dark); }
+
+  /* HERO */
+  .hero {
+    padding: 140px 5% 100px;
+    text-align: center;
+    background: linear-gradient(180deg, #f0fdf8 0%, #ffffff 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(26,158,110,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--green-light); border: 1px solid rgba(26,158,110,0.3); border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 500; color: var(--green-dark); margin-bottom: 28px; }
+  .hero h1 { font-family: var(--font-head); font-size: clamp(36px, 6vw, 68px); font-weight: 800; line-height: 1.1; color: var(--text); margin-bottom: 24px; letter-spacing: -0.02em; }
+  .hero h1 span { color: var(--green); }
+  .hero p { font-size: clamp(16px, 2vw, 20px); color: var(--text-muted); max-width: 580px; margin: 0 auto 40px; line-height: 1.7; }
+  .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--green); color: white; border: none; border-radius: 12px; padding: 14px 28px; font-family: var(--font-head); font-size: 16px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.15s; }
+  .btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+  .btn-secondary { background: white; color: var(--text); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 28px; font-family: var(--font-head); font-size: 16px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.15s; }
+  .btn-secondary:hover { border-color: var(--green); color: var(--green); transform: translateY(-1px); }
+  .hero-note { margin-top: 20px; font-size: 13px; color: var(--text-muted); }
+
+  /* DEMO PREVIEW */
+  .demo-section { padding: 60px 5%; background: white; }
+  .demo-window {
+    max-width: 820px; margin: 0 auto;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+  }
+  .demo-topbar { background: var(--bg); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; gap: 8px; }
+  .demo-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .demo-url { background: white; border: 1px solid var(--border); border-radius: 6px; padding: 5px 14px; font-size: 13px; color: var(--text-muted); margin-left: 12px; flex: 1; max-width: 300px; }
+  .demo-body { padding: 32px; background: var(--bg); display: flex; flex-direction: column; gap: 16px; }
+  .demo-question { background: var(--green); color: white; border-radius: 14px 14px 4px 14px; padding: 14px 18px; font-size: 15px; align-self: flex-end; max-width: 80%; }
+  .demo-answer { background: white; border: 1px solid var(--border); border-radius: 4px 14px 14px 14px; padding: 18px; max-width: 85%; }
+  .demo-answer h4 { font-family: var(--font-head); font-size: 14px; font-weight: 600; color: var(--green-dark); margin-bottom: 10px; }
+  .demo-step { background: var(--green-light); border-left: 3px solid var(--green); border-radius: 0 8px 8px 0; padding: 8px 12px; margin: 6px 0; font-size: 13px; line-height: 1.5; }
+  .demo-step strong { color: var(--green-dark); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 2px; }
+  .demo-formula { background: #f3f0ff; border: 1px solid #c4b5fd; border-radius: 8px; padding: 8px 14px; font-family: monospace; font-size: 14px; color: #5b21b6; text-align: center; margin: 6px 0; }
+
+  /* FEATURES */
+  .features { padding: 100px 5%; background: white; }
+  .section-label { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
+  .section-title { font-family: var(--font-head); font-size: clamp(28px, 4vw, 44px); font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 16px; letter-spacing: -0.02em; }
+  .section-sub { font-size: 17px; color: var(--text-muted); max-width: 520px; line-height: 1.7; margin-bottom: 60px; }
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+  .feature-card { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 28px; transition: all 0.2s; }
+  .feature-card:hover { border-color: var(--green); background: var(--green-light); transform: translateY(-2px); }
+  .feature-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px; }
+  .feature-card h3 { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .feature-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+  /* SUBJECTS */
+  .subjects { padding: 80px 5%; background: var(--bg); text-align: center; }
+  .subjects-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 40px; }
+  .subject-pill { background: white; border: 1px solid var(--border); border-radius: 40px; padding: 10px 20px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: all 0.15s; cursor: default; }
+  .subject-pill:hover { border-color: var(--green); color: var(--green); }
+  .levels-row { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+  .level-badge { background: var(--green); color: white; border-radius: 20px; padding: 6px 18px; font-size: 13px; font-weight: 600; }
+
+  /* PRICING */
+  .pricing { padding: 100px 5%; background: white; text-align: center; }
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; max-width: 960px; margin: 0 auto; }
+  .pricing-card { border: 1.5px solid var(--border); border-radius: 20px; padding: 32px 24px; text-align: left; position: relative; transition: all 0.2s; }
+  .pricing-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+  .pricing-card.featured { border-color: var(--green); }
+  .pricing-card.featured::before { content: 'MOST POPULAR'; position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: var(--green); color: white; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; padding: 4px 14px; border-radius: 20px; white-space: nowrap; }
+  .plan-tier-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; }
+  .plan-title { font-family: var(--font-head); font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+  .plan-price-big { font-family: var(--font-head); font-size: 36px; font-weight: 800; color: var(--green-dark); margin: 12px 0; }
+  .plan-price-big span { font-size: 14px; font-weight: 400; color: var(--text-muted); }
+  .plan-divider { height: 1px; background: var(--border); margin: 20px 0; }
+  .plan-features-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .plan-features-list li { font-size: 14px; color: var(--text-muted); display: flex; align-items: flex-start; gap: 8px; }
+  .plan-features-list li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+  .plan-btn { display: block; width: 100%; background: var(--green); color: white; border: none; border-radius: 10px; padding: 13px; font-family: var(--font-head); font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; transition: background 0.15s; }
+  .plan-btn:hover { background: var(--green-dark); }
+  .plan-btn.outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+  .plan-btn.outline:hover { border-color: var(--green); color: var(--green); }
+  .free-plan { max-width: 960px; margin: 20px auto 0; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .free-plan strong { font-family: var(--font-head); font-size: 16px; }
+  .free-plan p { font-size: 14px; color: var(--text-muted); }
+
+  /* FAQ */
+  .faq { padding: 100px 5%; background: var(--bg); }
+  .faq-list { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  .faq-item { background: white; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .faq-q { padding: 18px 22px; font-weight: 600; font-size: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+  .faq-q:hover { background: var(--bg); }
+  .faq-icon { font-size: 20px; color: var(--text-muted); transition: transform 0.2s; }
+  .faq-a { display: none; padding: 0 22px 18px; font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+  .faq-item.open .faq-a { display: block; }
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+  /* CTA */
+  .cta-section { padding: 100px 5%; background: var(--green); text-align: center; }
+  .cta-section h2 { font-family: var(--font-head); font-size: clamp(28px, 4vw, 48px); font-weight: 800; color: white; margin-bottom: 16px; letter-spacing: -0.02em; }
+  .cta-section p { font-size: 17px; color: rgba(255,255,255,0.8); margin-bottom: 36px; }
+  .btn-white { background: white; color: var(--green-dark); border: none; border-radius: 12px; padding: 14px 32px; font-family: var(--font-head); font-size: 16px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.15s; }
+  .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+
+  /* FOOTER */
+  footer { background: var(--text); color: rgba(255,255,255,0.6); padding: 40px 5%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  footer .logo { color: white; font-size: 18px; }
+  footer .logo-mark { background: var(--green); }
+  footer p { font-size: 13px; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-badge, .hero h1, .hero p, .hero-btns, .hero-note { animation: fadeUp 0.6s ease both; }
+  .hero h1 { animation-delay: 0.1s; }
+  .hero p { animation-delay: 0.2s; }
+  .hero-btns { animation-delay: 0.3s; }
+  .hero-note { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-mark">✦</div>
+    StudyGenie
+  </a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a href="app.html" class="nav-cta">Start for free →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">✦ Built for Pakistani Students</div>
+  <h1>Study smarter with your<br><span>AI-powered tutor</span></h1>
+  <p>Get instant step-by-step answers for Matric, Intermediate, O-Levels & A-Levels. Available 24/7. No tuition fees.</p>
+  <div class="hero-btns">
+    <a href="app.html" class="btn-primary">Start for free — 5 questions/day</a>
+    <a href="#pricing" class="btn-secondary">See pricing</a>
+  </div>
+  <p class="hero-note">No credit card needed · Plans from PKR 500/month</p>
+</section>
+
+<!-- DEMO -->
+<section class="demo-section">
+  <div class="demo-window">
+    <div class="demo-topbar">
+      <div class="demo-dot" style="background:#ff5f57"></div>
+      <div class="demo-dot" style="background:#febc2e"></div>
+      <div class="demo-dot" style="background:#28c840"></div>
+      <div class="demo-url">studygenie.vercel.app/app</div>
+    </div>
+    <div class="demo-body">
+      <div class="demo-question">Solve: 2x² + 5x - 3 = 0</div>
+      <div class="demo-answer">
+        <h4>Solving using the Quadratic Formula</h4>
+        <div class="demo-formula">x = (-b ± √(b² - 4ac)) / 2a</div>
+        <div class="demo-step"><strong>Step 1 — Identify values</strong>a = 2, b = 5, c = -3</div>
+        <div class="demo-step"><strong>Step 2 — Calculate discriminant</strong>b² - 4ac = 25 - 4(2)(-3) = 25 + 24 = 49</div>
+        <div class="demo-step"><strong>Step 3 — Apply formula</strong>x = (-5 ± √49) / 4 = (-5 ± 7) / 4</div>
+        <div class="demo-step"><strong>Step 4 — Final answers</strong>x = 0.5 or x = -3 ✓</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label">Why StudyGenie</div>
+  <div class="section-title">Everything you need<br>to ace your exams</div>
+  <p class="section-sub">Built specifically for Pakistani students. No generic AI — real curriculum-aligned answers.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#e6f7f1">📚</div>
+      <h3>Pakistani Curriculum</h3>
+      <p>Answers aligned with Federal Board, Punjab Board, Sindh Board, and Cambridge O/A Level syllabi.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#fef3c7">⚡</div>
+      <h3>Instant Step-by-Step</h3>
+      <p>Don't just get the answer — understand why. Every solution is broken down clearly so you actually learn.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#fdf4ff">🌐</div>
+      <h3>Urdu Explanations</h3>
+      <p>Struggling to understand in English? Pro plan includes full Urdu explanations for every subject.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#eff6ff">🕐</div>
+      <h3>24/7 Available</h3>
+      <p>No tutor scheduling, no waiting. Get answers at 2am the night before your exam.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#f0fdf4">💰</div>
+      <h3>PKR Pricing</h3>
+      <p>Pay in Pakistani Rupees. No dollar conversions, no foreign payment headaches.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#fff7ed">📝</div>
+      <h3>Past Paper Mode</h3>
+      <p>Coming in Pro plan — practice with real past paper questions and get exam-style answers.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SUBJECTS -->
+<section class="subjects">
+  <div class="section-label">Coverage</div>
+  <div class="section-title">All your subjects, all your levels</div>
+  <div class="subjects-grid">
+    <div class="subject-pill">📐 Mathematics</div>
+    <div class="subject-pill">⚛️ Physics</div>
+    <div class="subject-pill">🧪 Chemistry</div>
+    <div class="subject-pill">🧬 Biology</div>
+    <div class="subject-pill">📝 English</div>
+    <div class="subject-pill">📖 Urdu</div>
+    <div class="subject-pill">💻 Computer Science</div>
+    <div class="subject-pill">📊 Economics</div>
+    <div class="subject-pill">🏛️ Pakistan Studies</div>
+    <div class="subject-pill">☪️ Islamiyat</div>
+  </div>
+  <div class="levels-row" style="margin-top:32px">
+    <span class="level-badge">Matric</span>
+    <span class="level-badge">Intermediate</span>
+    <span class="level-badge">O-Levels</span>
+    <span class="level-badge">A-Levels</span>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-label">Pricing</div>
+  <div class="section-title">Simple, affordable plans</div>
+  <p class="section-sub" style="margin: 0 auto 48px;">All plans include access to all subjects and all levels. Pay in PKR.</p>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="plan-tier-label">Beginner</div>
+      <div class="plan-title">Starter</div>
+      <div class="plan-price-big">PKR 500 <span>/month</span></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features-list">
+        <li>20 questions per day</li>
+        <li>All subjects included</li>
+        <li>All levels (Matric to A-Levels)</li>
+        <li>Step-by-step answers</li>
+      </ul>
+      <a href="app.html" class="plan-btn outline">Get Starter</a>
+    </div>
+
+    <div class="pricing-card featured">
+      <div class="plan-tier-label">Intermediate</div>
+      <div class="plan-title">Scholar</div>
+      <div class="plan-price-big">PKR 750 <span>/month</span></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features-list">
+        <li>50 questions per day</li>
+        <li>All subjects included</li>
+        <li>All levels (Matric to A-Levels)</li>
+        <li>Detailed explanations</li>
+        <li>Priority answer speed</li>
+      </ul>
+      <a href="app.html" class="plan-btn">Get Scholar</a>
+    </div>
+
+    <div class="pricing-card">
+      <div class="plan-tier-label">Advanced</div>
+      <div class="plan-title">Pro</div>
+      <div class="plan-price-big">PKR 999 <span>/month</span></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features-list">
+        <li>Unlimited questions</li>
+        <li>All subjects included</li>
+        <li>Urdu explanations</li>
+        <li>Past paper mode</li>
+        <li>Fastest answer speed</li>
+      </ul>
+      <a href="app.html" class="plan-btn">Get Pro</a>
+    </div>
+  </div>
+
+  <div class="free-plan">
+    <div>
+      <strong>Free Plan — Always available</strong>
+      <p>5 questions per day · All subjects · No credit card needed</p>
+    </div>
+    <a href="app.html" class="plan-btn" style="width:auto; padding: 10px 24px;">Start free →</a>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div style="text-align:center; margin-bottom:48px;">
+    <div class="section-label">FAQ</div>
+    <div class="section-title">Common questions</div>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Is StudyGenie free to use? <span class="faq-icon">+</span></div>
+      <div class="faq-a">Yes! You get 5 free questions every day with no credit card required. Paid plans unlock more questions starting from PKR 500/month.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Which boards are covered? <span class="faq-icon">+</span></div>
+      <div class="faq-a">StudyGenie covers Federal Board, Punjab Board, Sindh Board, KPK Board, and Cambridge International (O-Levels and A-Levels).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I pay in Pakistan? <span class="faq-icon">+</span></div>
+      <div class="faq-a">We accept Visa, Mastercard, JazzCash, and EasyPaisa. All payments are in PKR — no dollar conversion needed.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Can StudyGenie replace my tutor? <span class="faq-icon">+</span></div>
+      <div class="faq-a">StudyGenie is a supplement to your studies — it explains concepts and solves problems step by step. It works best alongside your classes and textbooks.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is past paper mode? <span class="faq-icon">+</span></div>
+      <div class="faq-a">Past paper mode (available in the Pro plan) lets you practice with real past exam questions and get answers in the exact format required by your board. Coming soon!</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Can I get answers in Urdu? <span class="faq-icon">+</span></div>
+      <div class="faq-a">Yes! The Pro plan (PKR 999/month) includes full Urdu explanations for every subject and every level.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Start studying smarter today</h2>
+  <p>Join thousands of Pakistani students acing their exams with StudyGenie</p>
+  <a href="app.html" class="btn-white">Try free — no signup needed →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="logo">
+    <div class="logo-mark">✦</div>
+    StudyGenie
+  </a>
+  <p>Built for Pakistani students · Karachi, Pakistan</p>
+  <p>© 2025 StudyGenie. All rights reserved.</p>
+</footer>
+
+<script>
+  function toggleFaq(el) {
+    const item = el.parentElement;
+    item.classList.toggle('open');
+  }
+</script>
+</body>
+</html>
