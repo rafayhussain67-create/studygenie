@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
-  const prompt = `You are StudyGenie, an AI tutor for Pakistani ${level} students studying ${subject}. Give clear step-by-step answers aligned with the Pakistani curriculum (Federal Board, Punjab Board, Sindh Board, Cambridge O/A Levels). Use simple English for the student.
+  const prompt = `You are StudyGenie, an AI tutor for Pakistani ${level} students studying ${subject}. Give clear step-by-step answers aligned with the Pakistani curriculum. Use simple English.
 
 Format your response as HTML:
 - Use <h3> for the main answer heading
@@ -20,7 +20,7 @@ Format your response as HTML:
 - Use <div class="formula-box">formula here</div> for math formulas
 - End with a short encouraging <p> tag
 
-Be concise, accurate, and friendly. The question is: ${question}`;
+Question: ${question}`;
 
   try {
     const response = await fetch(
@@ -29,18 +29,28 @@ Be concise, accurate, and friendly. The question is: ${question}`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
           generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
         })
       }
     );
 
     const data = await response.json();
+
+    if (!response.ok) {
+      console.error('Gemini error:', JSON.stringify(data));
+      return res.status(500).json({ error: 'Gemini error', details: data.error?.message || 'Unknown' });
+    }
+
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) return res.status(500).json({ error: 'No response from AI' });
+    if (!text) {
+      console.error('No text in response:', JSON.stringify(data));
+      return res.status(500).json({ error: 'No response text' });
+    }
 
     return res.status(200).json({ answer: text });
   } catch (err) {
-    return res.status(500).json({ error: 'AI request failed' });
+    console.error('Fetch error:', err.message);
+    return res.status(500).json({ error: err.message });
   }
 }
