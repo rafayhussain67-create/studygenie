@@ -589,26 +589,53 @@
     const file = input.files[0];
     if(!file) return;
     openFlashcards();
-    const body = document.getElementById('fc-body');
-    body.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Reading your PDF and generating flashcards...</p></div>';
+    const fcBody = document.getElementById('fc-body');
+    fcBody.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Reading your PDF...</p></div>';
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const base64 = e.target.result.split(',')[1];
-      try {
-        const res = await fetch('/api/flashcards', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pdf: base64, subject: sub, level: lvl })
-        });
-        const data = await res.json();
-        if(data.flashcards) renderFlashcards(data.flashcards);
-        else body.innerHTML = '<p style="color:#e24b4a;text-align:center">Sorry, could not generate flashcards. Please try again.</p>';
-      } catch(err) {
-        body.innerHTML = '<p style="color:#e24b4a;text-align:center">Error generating flashcards. Please try again.</p>';
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+
+      fcBody.querySelector('p').textContent = 'Extracting text from ' + pdf.numPages + ' pages...';
+
+      let fullText = '';
+      for(let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        fullText += pageText + '\n';
       }
-    };
-    reader.readAsDataURL(file);
+
+      if(!fullText.trim()) {
+        fcBody.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Could not extract text from this PDF. Make sure it\'s a text-based PDF, not a scanned image.</p>';
+        return;
+      }
+
+      fcBody.querySelector('p').textContent = 'Detecting subject and generating flashcards...';
+
+      const res = await fetch('/api/flashcards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: fullText.substring(0, 8000), level: lvl })
+      });
+      const data = await res.json();
+
+      if(data.flashcards) {
+        if(data.subject) {
+          document.querySelectorAll('.sidebar .s-btn').forEach(b => b.classList.remove('active'));
+          const subBtn = document.getElementById('sb-' + data.subject);
+          if(subBtn) { subBtn.classList.add('active'); sub = data.subject; document.getElementById('sub-label').textContent = data.subject; }
+          document.getElementById('fc-page').querySelector('h2').textContent = '📚 ' + data.subject + ' Flashcards';
+        }
+        renderFlashcards(data.flashcards);
+      } else {
+        fcBody.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Sorry, could not generate flashcards. Please try again.</p>';
+      }
+    } catch(err) {
+      console.error(err);
+      fcBody.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Error reading PDF: ' + err.message + '</p>';
+    }
   }
 
   function renderFlashcards(cards) {
@@ -669,5 +696,7 @@
     addMsg('ai',`<h3>Payment coming very soon!</h3><p>You selected <strong>${planInfo[plan].n} (${planInfo[plan].p}/mo)</strong>. We're integrating Paddle so you can pay via Visa, Mastercard, JazzCash, or EasyPaisa — all in PKR!</p>`);
   }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";</script>
 </body>
 </html>
