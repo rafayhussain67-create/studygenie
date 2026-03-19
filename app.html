@@ -101,9 +101,9 @@
   .send:active { transform: scale(0.95); }
   .send:disabled { background: #d1d5db; cursor: not-allowed; }
   .send svg { width: 18px; height: 18px; fill: white; }
-  .plus-btn { width: 46px; height: 46px; background: var(--white); border: 1.5px solid var(--border); border-radius: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; font-size: 22px; font-weight: 700; color: var(--green); position: relative; }
+  .plus-btn { width: 46px; height: 46px; background: var(--white); border: 1.5px solid var(--border); border-radius: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; font-size: 22px; font-weight: 700; color: var(--green); position: relative; align-self: flex-end; }
   .plus-btn:hover { border-color: var(--green); background: var(--green-light); }
-  .plus-menu { position: absolute; bottom: 52px; right: 0; background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 6px; min-width: 190px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); display: none; flex-direction: column; gap: 2px; z-index: 999; }
+  .plus-menu { position: absolute; bottom: 54px; right: 0; background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 6px; min-width: 190px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); display: none; flex-direction: column; gap: 2px; z-index: 999; white-space: nowrap; }
   .plus-menu.open { display: flex; }
   .plus-menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: none; background: transparent; cursor: pointer; font-family: var(--font-body); font-size: 14px; color: var(--text); transition: background 0.12s; text-align: left; width: 100%; }
   .plus-menu-item:hover { background: var(--green-light); color: var(--green-dark); }
@@ -273,7 +273,7 @@
             </div>
             <textarea id="q" placeholder="Type or paste your question here..." onkeydown="onKey(event)" oninput="resize(this)"></textarea>
           </div>
-          <div style="position:relative;flex-shrink:0;">
+          <div style="position:relative;flex-shrink:0;align-self:flex-end;">
             <button class="plus-btn" onclick="togglePlusMenu(event)" id="plus-btn">+
               <div class="plus-menu" id="plus-menu">
                 <button class="plus-menu-item" onclick="document.getElementById('img-input').click()"><span>🖼️</span> Upload a photo</button>
