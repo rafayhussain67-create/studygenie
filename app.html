@@ -462,6 +462,7 @@
       const data = await res.json();
       removeLoader();
       addMsg('ai', data.answer || 'Sorry, something went wrong. Please try again.');
+      if(currentImageBase64) removeImage();
     } catch(e) {
       removeLoader();
       addMsg('ai','<p>Connection error. Please check your internet and try again.</p>');
@@ -469,7 +470,6 @@
 
     busy=false;
     document.getElementById('send').disabled=false;
-    if(currentImageBase64) removeImage();
 
     if(credits===0) {
       setTimeout(()=>{ addMsg('ai','<h3>You\'ve used all 5 free questions!</h3><p>Upgrade to keep studying. Plans start from just <strong>PKR 500/month</strong> — click Upgrade above!</p>'); },800);
