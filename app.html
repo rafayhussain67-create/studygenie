@@ -1518,8 +1518,21 @@
         body: JSON.stringify({ subject, topic, level: lvl })
       });
       const data = await res.json();
-      if(data.formulas) renderFormulaSheet(data.formulas, subject, topic);
-      else body.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Could not generate formula sheet. Please try again.</p>';
+      if(data.mismatch) {
+        body.innerHTML = \`
+          <div class="formula-setup">
+            <div style="text-align:center;padding:20px">
+              <div style="font-size:48px;margin-bottom:12px">⚠️</div>
+              <h3 style="color:#e24b4a;margin-bottom:8px">Subject Mismatch</h3>
+              <p style="color:var(--text-muted);margin-bottom:20px">\${data.error}</p>
+              <button class="formula-gen-btn" onclick="openFormulas()" style="max-width:200px;margin:0 auto">Try Again →</button>
+            </div>
+          </div>\`;
+      } else if(data.formulas) {
+        renderFormulaSheet(data.formulas, subject, topic);
+      } else {
+        body.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Could not generate formula sheet. Please try again.</p>';
+      }
     } catch(e) {
       body.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Error: ' + e.message + '</p>';
     }
