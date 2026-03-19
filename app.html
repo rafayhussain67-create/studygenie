@@ -1314,11 +1314,9 @@
 
   function pay() {
     closeModal();
-    addMsg('ai',`<h3>Payment coming very soon!</h3><p>You selected <strong>${planInfo[plan].n} (${planInfo[plan].p}/mo)</strong>. We're integrating Paddle so you can pay via Visa, Mastercard, JazzCash, or EasyPaisa — all in PKR!</p>`);
+    addMsg('ai','<h3>Payment coming very soon!</h3><p>You selected the <strong>' + planInfo[plan].n + ' (' + planInfo[plan].p + '/mo)</strong> plan. Paddle payments coming soon — Visa, Mastercard, JazzCash, EasyPaisa all in PKR!</p>');
   }
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script>pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
   // ============================================
   // TOAST
   // ============================================
@@ -1363,7 +1361,7 @@
     const likeBtn = document.getElementById('like-' + msgId);
     const dislikeBtn = document.getElementById('dislike-' + msgId);
     if(type === 'like') { likeBtn.classList.add('liked'); showToast('👍 Thanks for the feedback!'); }
-    else { dislikeBtn.classList.add('disliked'); showToast('👎 Got it — we'll do better!'); }
+    else { dislikeBtn.classList.add('disliked'); showToast('👎 Got it — noted!'); }
   }
 
   async function regenerateAnswer(msgId) {
@@ -1552,5 +1550,7 @@
   }
 
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";</script>
 </body>
 </html>
