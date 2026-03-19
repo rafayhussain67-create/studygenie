@@ -101,6 +101,12 @@
   .send:active { transform: scale(0.95); }
   .send:disabled { background: #d1d5db; cursor: not-allowed; }
   .send svg { width: 18px; height: 18px; fill: white; }
+  .cam-btn { width: 46px; height: 46px; background: var(--white); border: 1.5px solid var(--border); border-radius: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; font-size: 20px; }
+  .cam-btn:hover { border-color: var(--green); background: var(--green-light); }
+  #img-preview { display: none; max-width: 200px; max-height: 120px; border-radius: 10px; border: 1.5px solid var(--border); object-fit: cover; }
+  .img-preview-wrap { display: none; align-items: center; gap: 8px; }
+  .img-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 0; }
+  .img-remove:hover { color: #e24b4a; }
   .foot-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
   .foot-row span { color: var(--green); font-weight: 500; }
 
@@ -212,8 +218,15 @@
 
     <div class="input-zone">
       <div class="input-inner">
+        <div class="img-preview-wrap" id="img-preview-wrap">
+            <img id="img-preview" src="" alt="Question photo">
+            <button class="img-remove" onclick="removeImage()" title="Remove image">✕</button>
+            <span style="font-size:12px;color:var(--text-muted)">Image ready to solve</span>
+          </div>
         <div class="input-row">
+          <input type="file" id="img-input" accept="image/*" capture="environment" style="display:none" onchange="handleImage(this)">
           <textarea id="q" placeholder="Type or paste your question here..." onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+          <button class="cam-btn" onclick="document.getElementById('img-input').click()" title="Upload question photo">📷</button>
           <button class="send" id="send" onclick="ask()">
             <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
@@ -262,6 +275,30 @@
 
 <script>
   let credits = 5, sub = 'Mathematics', lvl = '', busy = false, started = false, plan = 'scholar';
+  let currentImageBase64 = null;
+
+  function handleImage(input) {
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      currentImageBase64 = e.target.result.split(',')[1];
+      document.getElementById('img-preview').src = e.target.result;
+      document.getElementById('img-preview').style.display = 'block';
+      document.getElementById('img-preview-wrap').style.display = 'flex';
+      document.getElementById('q').placeholder = 'Add any extra context (optional)...';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeImage() {
+    currentImageBase64 = null;
+    document.getElementById('img-preview').src = '';
+    document.getElementById('img-preview').style.display = 'none';
+    document.getElementById('img-preview-wrap').style.display = 'none';
+    document.getElementById('img-input').value = '';
+    document.getElementById('q').placeholder = 'Type or paste your question here...';
+  }
   const planInfo = { starter:{n:'Starter',p:'PKR 500'}, scholar:{n:'Scholar',p:'PKR 750'}, pro:{n:'Pro',p:'PKR 999'} };
 
   const levelChips = {
@@ -418,7 +455,7 @@
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q, subject: sub, level: lvl })
+        body: JSON.stringify({ question: q || 'Solve this question from the image', subject: sub, level: lvl, image: currentImageBase64 })
       });
       const data = await res.json();
       removeLoader();
@@ -430,6 +467,7 @@
 
     busy=false;
     document.getElementById('send').disabled=false;
+    if(currentImageBase64) removeImage();
 
     if(credits===0) {
       setTimeout(()=>{ addMsg('ai','<h3>You\'ve used all 5 free questions!</h3><p>Upgrade to keep studying. Plans start from just <strong>PKR 500/month</strong> — click Upgrade above!</p>'); },800);
