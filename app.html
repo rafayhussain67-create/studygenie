@@ -101,8 +101,51 @@
   .send:active { transform: scale(0.95); }
   .send:disabled { background: #d1d5db; cursor: not-allowed; }
   .send svg { width: 18px; height: 18px; fill: white; }
-  .cam-btn { width: 46px; height: 46px; background: var(--white); border: 1.5px solid var(--border); border-radius: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; font-size: 20px; }
-  .cam-btn:hover { border-color: var(--green); background: var(--green-light); }
+  .plus-btn { width: 46px; height: 46px; background: var(--white); border: 1.5px solid var(--border); border-radius: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; font-size: 22px; font-weight: 700; color: var(--green); position: relative; }
+  .plus-btn:hover { border-color: var(--green); background: var(--green-light); }
+  .plus-menu { position: absolute; bottom: 56px; right: 0; background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 6px; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); display: none; flex-direction: column; gap: 2px; z-index: 50; }
+  .plus-menu.open { display: flex; }
+  .plus-menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: none; background: transparent; cursor: pointer; font-family: var(--font-body); font-size: 14px; color: var(--text); transition: background 0.12s; text-align: left; width: 100%; }
+  .plus-menu-item:hover { background: var(--green-light); color: var(--green-dark); }
+  .plus-menu-item span { font-size: 18px; }
+
+  /* FLASHCARDS */
+  .fc-page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+  .fc-page.active { display: flex; }
+  .fc-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--white); }
+  .fc-header h2 { font-family: var(--font-head); font-size: 17px; font-weight: 700; }
+  .fc-back { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 14px; font-family: var(--font-body); font-size: 13px; color: var(--text-muted); cursor: pointer; }
+  .fc-back:hover { border-color: var(--green); color: var(--green); }
+  .fc-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+  .fc-upload-area { border: 2px dashed var(--border); border-radius: 16px; padding: 40px 24px; text-align: center; max-width: 480px; width: 100%; cursor: pointer; transition: all 0.15s; }
+  .fc-upload-area:hover { border-color: var(--green); background: var(--green-light); }
+  .fc-upload-icon { font-size: 40px; margin-bottom: 12px; }
+  .fc-upload-area h3 { font-family: var(--font-head); font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .fc-upload-area p { font-size: 13px; color: var(--text-muted); }
+  .fc-limits { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 600px; width: 100%; }
+  .fc-limit-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 10px; text-align: center; }
+  .fc-limit-card .plan { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 4px; }
+  .fc-limit-card .cards { font-family: var(--font-head); font-size: 18px; font-weight: 800; color: var(--green); }
+  .fc-limit-card .desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .fc-generating { text-align: center; padding: 20px; }
+  .fc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; max-width: 800px; width: 100%; }
+  .flashcard { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 20px; cursor: pointer; transition: all 0.2s; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; perspective: 1000px; }
+  .flashcard:hover { border-color: var(--green); transform: translateY(-2px); }
+  .flashcard.flipped .fc-front { display: none; }
+  .flashcard.flipped .fc-back-content { display: flex; }
+  .flashcard.flipped { background: var(--green-light); border-color: var(--green); }
+  .fc-front { display: flex; flex-direction: column; gap: 8px; }
+  .fc-back-content { display: none; flex-direction: column; gap: 8px; }
+  .fc-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--green); }
+  .fc-question { font-size: 14px; font-weight: 600; line-height: 1.5; }
+  .fc-answer { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .fc-hint { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 8px; }
+  .fc-count { font-size: 13px; color: var(--text-muted); text-align: center; }
+  .fc-actions { display: flex; gap: 10px; justify-content: center; }
+  .fc-action-btn { background: var(--white); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 20px; font-family: var(--font-body); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; color: var(--text); }
+  .fc-action-btn:hover { border-color: var(--green); color: var(--green); }
+  .fc-action-btn.primary { background: var(--green); color: white; border-color: var(--green); }
+  .fc-action-btn.primary:hover { background: var(--green-dark); }
   #img-preview { display: none; width: 36px; height: 36px; border-radius: 6px; border: 1.5px solid var(--border); object-fit: cover; flex-shrink: 0; }
   .img-preview-wrap { display: none; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px; }
   .img-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 0; }
@@ -219,7 +262,9 @@
     <div class="input-zone">
       <div class="input-inner">
         <div class="input-row">
-          <input type="file" id="img-input" accept="image/*" capture="environment" style="display:none" onchange="handleImage(this)">
+          <input type="file" id="img-input" accept="image/*" style="display:none" onchange="handleImage(this)">
+          <input type="file" id="cam-input" accept="image/*" capture="environment" style="display:none" onchange="handleImage(this)">
+          <input type="file" id="pdf-input" accept=".pdf" style="display:none" onchange="handlePDF(this)">
           <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
             <div class="img-preview-wrap" id="img-preview-wrap">
               <img id="img-preview" src="" alt="Question photo">
@@ -228,7 +273,15 @@
             </div>
             <textarea id="q" placeholder="Type or paste your question here..." onkeydown="onKey(event)" oninput="resize(this)"></textarea>
           </div>
-          <button class="cam-btn" onclick="document.getElementById('img-input').click()" title="Upload question photo">📷</button>
+          <div style="position:relative;flex-shrink:0;">
+            <button class="plus-btn" onclick="togglePlusMenu(event)" id="plus-btn">+
+              <div class="plus-menu" id="plus-menu">
+                <button class="plus-menu-item" onclick="document.getElementById('img-input').click()"><span>🖼️</span> Upload a photo</button>
+                <button class="plus-menu-item" onclick="document.getElementById('cam-input').click()"><span>📷</span> Take a photo</button>
+                <button class="plus-menu-item" onclick="openFlashcards()"><span>📄</span> Upload PDF (flashcards)</button>
+              </div>
+            </button>
+          </div>
           <button class="send" id="send" onclick="ask()">
             <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
@@ -240,6 +293,43 @@
       </div>
     </div>
   </main>
+</div>
+
+<!-- FLASHCARD PAGE -->
+<div class="fc-page" id="fc-page">
+  <div class="fc-header">
+    <h2>📚 Flashcards</h2>
+    <button class="fc-back" onclick="closeFlashcards()">← Back to Chat</button>
+  </div>
+  <div class="fc-body" id="fc-body">
+    <div class="fc-upload-area" onclick="document.getElementById('pdf-input').click()">
+      <div class="fc-upload-icon">📄</div>
+      <h3>Upload a PDF to generate flashcards</h3>
+      <p>Upload your notes, textbook chapter, or past paper and we'll create flashcards automatically</p>
+    </div>
+    <div class="fc-limits">
+      <div class="fc-limit-card">
+        <div class="plan">Free</div>
+        <div class="cards">10</div>
+        <div class="desc">cards · 1 PDF</div>
+      </div>
+      <div class="fc-limit-card">
+        <div class="plan">Starter</div>
+        <div class="cards">30</div>
+        <div class="desc">cards · 5 PDFs/mo</div>
+      </div>
+      <div class="fc-limit-card">
+        <div class="plan">Scholar</div>
+        <div class="cards">60</div>
+        <div class="desc">cards · 15 PDFs/mo</div>
+      </div>
+      <div class="fc-limit-card" style="border-color:var(--green);background:var(--green-light)">
+        <div class="plan" style="color:var(--green)">Pro</div>
+        <div class="cards">100</div>
+        <div class="desc">cards · Unlimited</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- PRICING MODAL -->
@@ -478,6 +568,82 @@
       setTimeout(()=>{ addMsg('ai','<h3>You\'ve used all 5 free questions!</h3><p>Upgrade to keep studying. Plans start from just <strong>PKR 500/month</strong> — click Upgrade above!</p>'); },800);
     }
   }
+
+  function togglePlusMenu(e) {
+    e.stopPropagation();
+    document.getElementById('plus-menu').classList.toggle('open');
+  }
+  document.addEventListener('click', () => {
+    document.getElementById('plus-menu')?.classList.remove('open');
+  });
+
+  function openFlashcards() {
+    document.getElementById('plus-menu').classList.remove('open');
+    document.querySelector('.layout').style.display = 'none';
+    document.getElementById('fc-page').classList.add('active');
+  }
+
+  function closeFlashcards() {
+    document.querySelector('.layout').style.display = 'flex';
+    document.getElementById('fc-page').classList.remove('active');
+  }
+
+  async function handlePDF(input) {
+    const file = input.files[0];
+    if(!file) return;
+    openFlashcards();
+    const body = document.getElementById('fc-body');
+    body.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Reading your PDF and generating flashcards...</p></div>';
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = e.target.result.split(',')[1];
+      try {
+        const res = await fetch('/api/flashcards', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pdf: base64, subject: sub, level: lvl })
+        });
+        const data = await res.json();
+        if(data.flashcards) renderFlashcards(data.flashcards);
+        else body.innerHTML = '<p style="color:#e24b4a;text-align:center">Sorry, could not generate flashcards. Please try again.</p>';
+      } catch(err) {
+        body.innerHTML = '<p style="color:#e24b4a;text-align:center">Error generating flashcards. Please try again.</p>';
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderFlashcards(cards) {
+    const body = document.getElementById('fc-body');
+    body.innerHTML = `
+      <p class="fc-count">${cards.length} flashcards generated · Click any card to reveal the answer</p>
+      <div class="fc-actions">
+        <button class="fc-action-btn" onclick="flipAll()">Flip All</button>
+        <button class="fc-action-btn" onclick="resetAll()">Reset</button>
+        <button class="fc-action-btn primary" onclick="document.getElementById('pdf-input').click()">Upload Another PDF</button>
+      </div>
+      <div class="fc-grid" id="fc-grid">
+        ${cards.map((card, i) => `
+          <div class="flashcard" id="fc-${i}" onclick="flipCard(${i})">
+            <div class="fc-front">
+              <div class="fc-tag">Question ${i+1}</div>
+              <div class="fc-question">${card.question}</div>
+              <div class="fc-hint">Tap to reveal answer →</div>
+            </div>
+            <div class="fc-back-content">
+              <div class="fc-tag">Answer</div>
+              <div class="fc-answer">${card.answer}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function flipCard(i) { document.getElementById('fc-'+i).classList.toggle('flipped'); }
+  function flipAll() { document.querySelectorAll('.flashcard').forEach(c => c.classList.add('flipped')); }
+  function resetAll() { document.querySelectorAll('.flashcard').forEach(c => c.classList.remove('flipped')); }
 
   function toggleDark() {
     document.body.classList.toggle('dark');
