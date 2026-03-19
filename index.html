@@ -47,8 +47,6 @@
   body.dark .faq-item { background: #1a1f2e; border-color: var(--border); }
   body.dark .faq-q { color: #e2e8f0; }
   body.dark .faq-a { color: #94a3b8; }
-  body.dark .plan-btn.outline { background: transparent; border-color: rgba(255,255,255,0.25); color: #e2e8f0; }
-  body.dark .plan-btn.outline:hover { border-color: var(--green); color: var(--green); }
   .dark-toggle { background: transparent; border: 1.5px solid var(--border); border-radius: 10px; padding: 8px 12px; cursor: pointer; font-size: 16px; color: var(--text-muted); transition: all 0.15s; }
   .dark-toggle:hover { border-color: var(--green); }
 
@@ -152,12 +150,12 @@
   .plan-features-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
   .plan-features-list li { font-size: 14px; color: var(--text-muted); display: flex; align-items: flex-start; gap: 8px; }
   .plan-features-list li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
-  .plan-btn { display: block; width: 100%; background: var(--green); color: white; border: 1.5px solid var(--green); border-radius: 10px; padding: 13px; font-family: var(--font-head); font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; transition: all 0.15s; box-sizing: border-box; }
+  .plan-btn { display: block; width: 100%; background: var(--green); color: white; border: 2px solid var(--green); border-radius: 10px; padding: 14px 13px; font-family: var(--font-head); font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; transition: all 0.15s; box-sizing: border-box; line-height: 1.2; }
   .plan-btn:hover { background: var(--green-dark); border-color: var(--green-dark); }
-  .plan-btn.outline { background: transparent; border: 1.5px solid #6b7280; color: #374151; }
-  .plan-btn.outline:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
-  body.dark .plan-btn.outline { border-color: #9ca3af; color: #e2e8f0; }
-  body.dark .plan-btn.outline:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+  .plan-btn.outline { background: transparent; border: 2px solid #1a9e6e; color: #1a9e6e; }
+  .plan-btn.outline:hover { background: var(--green); color: white; border-color: var(--green); }
+  body.dark .plan-btn.outline { border-color: #1a9e6e; color: #1a9e6e; }
+  body.dark .plan-btn.outline:hover { background: var(--green); color: white; }
   .free-plan { max-width: 960px; margin: 20px auto 0; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
   .free-plan strong { font-family: var(--font-head); font-size: 16px; }
   .free-plan p { font-size: 14px; color: var(--text-muted); }
