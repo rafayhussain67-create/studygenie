@@ -92,7 +92,7 @@
 
   .input-zone { border-top: 1px solid var(--border); padding: 14px 20px; background: var(--white); flex-shrink: 0; max-height: 220px; overflow: visible; }
   .input-inner { max-width: 740px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
-  .input-row { display: flex; gap: 8px; align-items: flex-end; }
+  .input-row { display: flex; gap: 8px; align-items: flex-end; width: 100%; }
   textarea { flex: 1; border: 1.5px solid var(--border); border-radius: 12px; padding: 11px 15px; font-family: var(--font-body); font-size: 14px; color: var(--text); resize: none; outline: none; height: 50px; max-height: 130px; background: var(--bg); transition: border-color 0.15s; line-height: 1.5; }
   textarea:focus { border-color: var(--green); background: var(--white); }
   textarea::placeholder { color: #9ca3af; }
@@ -103,7 +103,7 @@
   .send svg { width: 18px; height: 18px; fill: white; }
   .plus-btn { width: 46px; height: 46px; background: var(--white); border: 1.5px solid var(--border); border-radius: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; font-size: 22px; font-weight: 700; color: var(--green); position: relative; }
   .plus-btn:hover { border-color: var(--green); background: var(--green-light); }
-  .plus-menu { position: absolute; bottom: 56px; right: 0; background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 6px; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); display: none; flex-direction: column; gap: 2px; z-index: 50; }
+  .plus-menu { position: absolute; bottom: 52px; right: 0; background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 6px; min-width: 190px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); display: none; flex-direction: column; gap: 2px; z-index: 999; }
   .plus-menu.open { display: flex; }
   .plus-menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: none; background: transparent; cursor: pointer; font-family: var(--font-body); font-size: 14px; color: var(--text); transition: background 0.12s; text-align: left; width: 100%; }
   .plus-menu-item:hover { background: var(--green-light); color: var(--green-dark); }
@@ -224,7 +224,7 @@
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-label">Subject</div>
-    <button class="s-btn active" id="sb-Mathematics" onclick="setSub(this,'Mathematics')"><div class="s-icon" style="background:#fef3c7">📐</div>Mathematics</button>
+    <button class="s-btn" id="sb-Mathematics" onclick="setSub(this,'Mathematics')"><div class="s-icon" style="background:#fef3c7">📐</div>Mathematics</button>
     <button class="s-btn" id="sb-Physics" onclick="setSub(this,'Physics')"><div class="s-icon" style="background:#e0f2fe">⚛️</div>Physics</button>
     <button class="s-btn" id="sb-Chemistry" onclick="setSub(this,'Chemistry')"><div class="s-icon" style="background:#f0fdf4">🧪</div>Chemistry</button>
     <button class="s-btn" id="sb-Biology" onclick="setSub(this,'Biology')"><div class="s-icon" style="background:#fdf4ff">🧬</div>Biology</button>
@@ -287,7 +287,7 @@
           </button>
         </div>
         <div class="foot-row">
-          <span style="color:var(--text-muted)">Subject: <span id="sub-label">Mathematics</span> · Level: <span id="lvl-label">—</span></span>
+          <span style="color:var(--text-muted)">Subject: <span id="sub-label">Not selected</span> · Level: <span id="lvl-label">—</span></span>
           <span><span id="cr2">5</span> questions left today</span>
         </div>
       </div>
@@ -366,7 +366,7 @@
 </div>
 
 <script>
-  let credits = 5, sub = 'Mathematics', lvl = '', busy = false, started = false, plan = 'scholar';
+  let credits = 5, sub = '', lvl = '', busy = false, started = false, plan = 'scholar';
   let currentImageBase64 = null;
 
   function handleImage(input) {
