@@ -26,7 +26,20 @@
   }
 
   html { scroll-behavior: smooth; }
-  body { font-family: var(--font-body); color: var(--text); background: var(--white); overflow-x: hidden; }
+  body { font-family: var(--font-body); color: var(--text); background: var(--white); overflow-x: hidden; transition: background 0.2s, color 0.2s; }
+  body.dark {
+    --text: #f1f5f9; --text-muted: #94a3b8;
+    --border: #2d3748; --bg: #0f1117; --white: #1a1f2e;
+    --green-light: #0d2d20; --yellow-light: #2a1f00;
+  }
+  body.dark nav { background: rgba(26,31,46,0.92); }
+  body.dark .hero { background: linear-gradient(180deg, #0d2d20 0%, #0f1117 100%); }
+  body.dark .demo-window { box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+  body.dark .demo-topbar { background: #111827; }
+  body.dark .demo-body { background: #0f1117; }
+  body.dark .demo-answer { background: #1a1f2e; }
+  .dark-toggle { background: transparent; border: 1.5px solid var(--border); border-radius: 10px; padding: 8px 12px; cursor: pointer; font-size: 16px; color: var(--text-muted); transition: all 0.15s; }
+  .dark-toggle:hover { border-color: var(--green); }
 
   /* NAV */
   nav {
@@ -181,6 +194,7 @@
     <a href="#pricing">Pricing</a>
     <a href="#faq">FAQ</a>
   </div>
+  <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙</button>
   <a href="app.html" class="nav-cta">Start for free →</a>
 </nav>
 
@@ -395,7 +409,18 @@
   <p>© 2025 StudyGenie. All rights reserved.</p>
 </footer>
 
+
 <script>
+  function toggleDark() {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    document.getElementById('dark-btn').textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('studygenie-dark', isDark);
+  }
+  if(localStorage.getItem('studygenie-dark') === 'true') {
+    document.body.classList.add('dark');
+    document.getElementById('dark-btn').textContent = '☀️';
+  }
   function toggleFaq(el) {
     const item = el.parentElement;
     item.classList.toggle('open');
@@ -403,4 +428,3 @@
 </script>
 </body>
 </html>
-
