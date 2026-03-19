@@ -433,25 +433,43 @@
   <div class="quiz-body" id="quiz-body">
     <div class="quiz-setup">
       <h3>🧠 Test your knowledge</h3>
-      <p>Choose a quiz mode and we'll generate questions based on your subject and level</p>
-      <div class="quiz-plans">
-        <div class="quiz-plan selected" id="qp-free" onclick="selectQuizPlan('free')">
-          <div><div class="quiz-plan-name">Quick Quiz</div><div class="quiz-plan-desc">3 MCQ questions · Score shown</div></div>
-          <span class="quiz-plan-badge">FREE</span>
+      <p>Choose how you want to be quizzed — questions go from easy to hard</p>
+
+      <input type="file" id="quiz-pdf-input" accept=".pdf" style="display:none" onchange="handleQuizPDF(this)">
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+        <div class="quiz-plan selected" id="qm-topic" onclick="selectQuizMode('topic')">
+          <div><div class="quiz-plan-name">✏️ Type a topic</div><div class="quiz-plan-desc">e.g. "Quiz me on integration in Maths"</div></div>
         </div>
-        <div class="quiz-plan" id="qp-starter" onclick="selectQuizPlan('starter')">
-          <div><div class="quiz-plan-name">Standard Quiz</div><div class="quiz-plan-desc">10 questions · MCQ + True/False</div></div>
-          <span class="quiz-plan-badge locked">PKR 500</span>
+        <div id="quiz-topic-input-wrap" style="display:flex;gap:8px;">
+          <input type="text" id="quiz-topic-input" placeholder='e.g. "Newton's laws of motion"' style="flex:1;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:var(--font-body);font-size:14px;color:var(--text);background:var(--bg);outline:none;">
         </div>
-        <div class="quiz-plan" id="qp-scholar" onclick="selectQuizPlan('scholar')">
-          <div><div class="quiz-plan-name">Deep Dive</div><div class="quiz-plan-desc">20 questions · All types + history</div></div>
-          <span class="quiz-plan-badge locked">PKR 750</span>
+        <div class="quiz-plan" id="qm-pdf" onclick="selectQuizMode('pdf')">
+          <div><div class="quiz-plan-name">📄 Upload a PDF</div><div class="quiz-plan-desc">AI generates quiz from your notes or past paper</div></div>
         </div>
-        <div class="quiz-plan" id="qp-pro" onclick="selectQuizPlan('pro')">
-          <div><div class="quiz-plan-name">Pro Analysis</div><div class="quiz-plan-desc">Unlimited · Weak topic detection</div></div>
-          <span class="quiz-plan-badge locked">PKR 999</span>
+        <div class="quiz-plan" id="qm-subject" onclick="selectQuizMode('subject')">
+          <div><div class="quiz-plan-name">📚 By subject</div><div class="quiz-plan-desc">General quiz on your selected subject</div></div>
+        </div>
+        <div class="quiz-plan" id="qm-chat" onclick="selectQuizMode('chat')">
+          <div><div class="quiz-plan-name">💬 From my chat</div><div class="quiz-plan-desc">Quiz on topics you just studied in the chat</div></div>
         </div>
       </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:10px;">Number of questions</p>
+        <div style="display:flex;gap:8px;">
+          <button class="quiz-plan" id="qc-3" onclick="selectQuizCount(3)" style="flex:1;padding:8px;justify-content:center;border-color:var(--green);background:var(--green-light);">
+            <div style="text-align:center"><div class="quiz-plan-name">3</div><div class="quiz-plan-desc">Free</div></div>
+          </button>
+          <button class="quiz-plan" id="qc-10" onclick="selectQuizCount(10)" style="flex:1;padding:8px;justify-content:center;">
+            <div style="text-align:center"><div class="quiz-plan-name">10</div><div class="quiz-plan-desc">Starter</div></div>
+          </button>
+          <button class="quiz-plan" id="qc-20" onclick="selectQuizCount(20)" style="flex:1;padding:8px;justify-content:center;">
+            <div style="text-align:center"><div class="quiz-plan-name">20</div><div class="quiz-plan-desc">Pro</div></div>
+          </button>
+        </div>
+      </div>
+
       <button class="quiz-start-btn" onclick="startQuiz()">Start Quiz →</button>
     </div>
   </div>
@@ -655,10 +673,11 @@
       const actions = document.createElement('div');
       actions.className = 'msg-actions';
       actions.style.position = 'relative';
+      actions.dataset.lang = 'en';
       actions.innerHTML = `
         <button class="dots-btn" onclick="toggleDotsMenu('dm-${msgId}', event)">•••</button>
         <div class="dots-menu" id="dm-${msgId}">
-          <button class="dots-menu-item" onclick="translateUrdu('${msgId}','dm-${msgId}')">🇵🇰 Translate to Urdu</button>
+          <button class="dots-menu-item" id="translate-btn-${msgId}" onclick="toggleTranslation('${msgId}','dm-${msgId}')">🇵🇰 Translate to Urdu</button>
           <button class="dots-menu-item" onclick="explainSimpler('${msgId}','dm-${msgId}')">💡 Explain simpler</button>
           <button class="dots-menu-item locked" onclick="explainDetailed('${msgId}','dm-${msgId}')">📖 Explain in more detail <span class="lock-icon">PRO</span></button>
         </div>`;
@@ -732,6 +751,7 @@
       if(subBtn) { subBtn.classList.add('active'); sub = detected; document.getElementById('sub-label').textContent = detected; }
     }
 
+    chatHistory.push(q);
     addMsg('user', q);
     addLoader();
     busy=true;
@@ -761,17 +781,18 @@
   }
 
   // QUIZ MODE
-  let selectedQuizPlan = 'free';
+  let quizMode = 'topic';
+  let quizCount = 3;
   let quizQuestions = [];
   let quizCurrent = 0;
   let quizScore = 0;
   let quizAnswered = false;
+  let chatHistory = [];
 
   function openQuiz() {
     document.querySelector('.layout').style.display = 'none';
     document.getElementById('fc-page').classList.remove('active');
     document.getElementById('quiz-page').classList.add('active');
-    resetQuizSetup();
   }
 
   function closeQuiz() {
@@ -779,28 +800,54 @@
     document.querySelector('.layout').style.display = 'flex';
   }
 
-  function selectQuizPlan(plan) {
-    selectedQuizPlan = plan;
-    document.querySelectorAll('.quiz-plan').forEach(p => p.classList.remove('selected'));
-    document.getElementById('qp-' + plan).classList.add('selected');
-    if(plan !== 'free') { setTimeout(() => { openModal(); resetQuizSetup(); }, 100); }
+  function selectQuizMode(mode) {
+    quizMode = mode;
+    document.querySelectorAll('#quiz-body .quiz-plan[id^="qm-"]').forEach(p => p.classList.remove('selected'));
+    document.getElementById('qm-' + mode).classList.add('selected');
+    document.getElementById('quiz-topic-input-wrap').style.display = mode === 'topic' ? 'flex' : 'none';
+    if(mode === 'pdf') document.getElementById('quiz-pdf-input').click();
   }
 
-  function resetQuizSetup() {
-    selectedQuizPlan = 'free';
-    document.querySelectorAll('.quiz-plan').forEach(p => p.classList.remove('selected'));
-    document.getElementById('qp-free').classList.add('selected');
+  function selectQuizCount(n) {
+    if(n > 3) { openModal(); return; }
+    quizCount = n;
+    document.querySelectorAll('#quiz-body .quiz-plan[id^="qc-"]').forEach(p => p.classList.remove('selected'));
+    document.getElementById('qc-' + n).classList.add('selected', 'border-color:var(--green)');
+  }
+
+  let quizPdfText = '';
+  async function handleQuizPDF(input) {
+    const file = input.files[0];
+    if(!file) return;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let text = '';
+      for(let i = 1; i <= Math.min(pdf.numPages, 5); i++) {
+        const page = await pdf.getPage(i);
+        const tc = await page.getTextContent();
+        text += tc.items.map(item => item.str).join(' ') + '\n';
+      }
+      quizPdfText = text.substring(0, 4000);
+      document.getElementById('qm-pdf').querySelector('.quiz-plan-desc').textContent = '✅ ' + file.name + ' loaded';
+    } catch(e) { alert('Could not read PDF. Please try a text-based PDF.'); }
   }
 
   async function startQuiz() {
     const qBody = document.getElementById('quiz-body');
-    qBody.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Generating your quiz questions...</p></div>';
+    qBody.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Generating quiz questions from easy to hard...</p></div>';
+
+    let topic = '';
+    if(quizMode === 'topic') topic = document.getElementById('quiz-topic-input')?.value || sub || 'General';
+    else if(quizMode === 'pdf') topic = quizPdfText ? 'based on this content: ' + quizPdfText.substring(0, 2000) : sub || 'General';
+    else if(quizMode === 'subject') topic = sub || 'General';
+    else if(quizMode === 'chat') topic = chatHistory.slice(-6).join(' ').substring(0, 1000) || sub || 'General';
 
     try {
       const res = await fetch('/api/quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject: sub || 'General', level: lvl || 'Matric', count: 3 })
+        body: JSON.stringify({ topic, level: lvl || 'Matric', count: quizCount, mode: quizMode })
       });
       const data = await res.json();
       if(data.questions) {
@@ -812,7 +859,7 @@
         qBody.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Could not generate quiz. Please try again.</p>';
       }
     } catch(e) {
-      qBody.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Error generating quiz. Please try again.</p>';
+      qBody.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Error: ' + e.message + '</p>';
     }
   }
 
@@ -939,20 +986,36 @@
     document.querySelectorAll('.dots-menu').forEach(m => m.classList.remove('open'));
   });
 
-  async function translateUrdu(msgId, menuId) {
+  const msgOriginals = {};
+  const msgLang = {};
+
+  async function toggleTranslation(msgId, menuId) {
     document.getElementById(menuId).classList.remove('open');
     const bubble = document.getElementById(msgId);
-    const original = bubble.innerHTML;
+    const btn = document.getElementById('translate-btn-' + msgId);
+    const isUrdu = msgLang[msgId] === 'ur';
+
+    if(isUrdu) {
+      bubble.innerHTML = msgOriginals[msgId];
+      msgLang[msgId] = 'en';
+      btn.innerHTML = '🇵🇰 Translate to Urdu';
+      return;
+    }
+
+    msgOriginals[msgId] = bubble.innerHTML;
+    const text = bubble.innerHTML.replace(/<[^>]*>/g,'').substring(0,500);
     bubble.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: 'Translate this to Urdu, keeping the same HTML format with step-block and formula-box divs: ' + original.replace(/<[^>]*>/g,'').substring(0,500), subject: sub, level: lvl })
+        body: JSON.stringify({ question: 'Translate this explanation to Urdu, keeping the same HTML format with step-block and formula-box divs: ' + text, subject: sub, level: lvl })
       });
       const data = await res.json();
-      bubble.innerHTML = data.answer || original;
-    } catch(e) { bubble.innerHTML = original; }
+      bubble.innerHTML = data.answer || msgOriginals[msgId];
+      msgLang[msgId] = 'ur';
+      btn.innerHTML = '🇬🇧 Translate back to English';
+    } catch(e) { bubble.innerHTML = msgOriginals[msgId]; }
   }
 
   async function explainSimpler(msgId, menuId) {
