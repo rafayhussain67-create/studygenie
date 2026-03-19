@@ -285,10 +285,13 @@
     const reader = new FileReader();
     reader.onload = (e) => {
       currentImageBase64 = e.target.result.split(',')[1];
-      document.getElementById('img-preview').src = e.target.result;
-      document.getElementById('img-preview').style.display = 'block';
-      document.getElementById('img-preview-wrap').style.display = 'flex';
+      const preview = document.getElementById('img-preview');
+      const wrap = document.getElementById('img-preview-wrap');
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+      wrap.style.display = 'flex';
       document.getElementById('q').placeholder = 'Add any extra context (optional)...';
+      document.getElementById('q').focus();
     };
     reader.readAsDataURL(file);
   }
