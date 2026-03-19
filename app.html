@@ -14,7 +14,14 @@
     --border: #e5e7eb; --bg: #f9fafb; --white: #ffffff;
     --font-head: 'Sora', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
-  body { font-family: var(--font-body); background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  body.dark {
+    --text: #f1f5f9; --text-muted: #94a3b8;
+    --border: #2d3748; --bg: #0f1117; --white: #1a1f2e;
+    --green-light: #0d2d20; --yellow-light: #2a1f00;
+  }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.2s, color 0.2s; }
+  .dark-toggle { background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; cursor: pointer; font-size: 16px; color: var(--text-muted); transition: all 0.15s; }
+  .dark-toggle:hover { border-color: var(--green); }
 
   nav { background: var(--white); border-bottom: 1px solid var(--border); height: 60px; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; flex-shrink: 0; }
   .logo { font-family: var(--font-head); font-size: 19px; font-weight: 800; color: var(--green); display: flex; align-items: center; gap: 8px; text-decoration: none; }
@@ -160,6 +167,7 @@
   <div class="nav-right">
     <div class="credits-badge">⚡ <span id="cr">5</span> free left</div>
     <button class="btn-upgrade" onclick="openModal()">Upgrade — from PKR 500</button>
+    <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙</button>
     <a href="index.html" class="btn-home">← Home</a>
   </div>
 </nav>
@@ -274,9 +282,25 @@
     document.getElementById('sub-label').textContent = s;
   }
 
+  const chipSubjects = {
+    'Solve: 2x² + 5x - 3 = 0': 'Mathematics',
+    'Explain Newton's 3rd Law': 'Physics',
+    'What is photosynthesis?': 'Biology',
+    'Ionic vs covalent bonds': 'Chemistry',
+    'What is GDP?': 'Economics',
+    'Explain the water cycle': 'Biology'
+  };
+
   function useChip(btn) {
-    document.getElementById('q').value = btn.textContent;
+    const text = btn.textContent;
+    document.getElementById('q').value = text;
     document.getElementById('q').focus();
+    const detectedSub = chipSubjects[text];
+    if(detectedSub) {
+      document.querySelectorAll('.sidebar .s-btn').forEach(b => b.classList.remove('active'));
+      const subBtn = document.getElementById('sb-' + detectedSub);
+      if(subBtn) { subBtn.classList.add('active'); sub = detectedSub; document.getElementById('sub-label').textContent = detectedSub; }
+    }
   }
 
   function resize(el) { el.style.height='50px'; el.style.height=Math.min(el.scrollHeight,130)+'px'; }
@@ -346,6 +370,17 @@
     }
   }
 
+  function toggleDark() {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    document.getElementById('dark-btn').textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('studygenie-dark', isDark);
+  }
+  if(localStorage.getItem('studygenie-dark') === 'true') {
+    document.body.classList.add('dark');
+    document.getElementById('dark-btn').textContent = '☀️';
+  }
+
   function pickPlan(p) {
     plan=p;
     document.querySelectorAll('.p-card').forEach(c=>c.classList.remove('sel'));
@@ -364,4 +399,3 @@
 </script>
 </body>
 </html>
-
