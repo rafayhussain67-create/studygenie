@@ -14,7 +14,8 @@ export default async function handler(req, res) {
 
   const prompt = `Generate exactly ${n} multiple choice questions for a Pakistani ${level || 'Matric'} student.
 
-Topic/Subject: ${topic || 'General Science'}
+STRICT INSTRUCTION: Questions must be ONLY about: ${topic}
+Do NOT deviate from this topic under any circumstances.
 Mode: ${mode || 'topic'}
 
 IMPORTANT - Difficulty progression (required):
