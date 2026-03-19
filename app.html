@@ -500,17 +500,17 @@
   <div class="quiz-body" id="quiz-body">
     <div class="quiz-setup">
       <h3>🧠 Test your knowledge</h3>
-      <p>Choose how you want to be quizzed — questions go from easy to hard</p>
+      <p>What do you want to be quizzed on?</p>
 
       <input type="file" id="quiz-pdf-input" accept=".pdf" style="display:none" onchange="handleQuizPDF(this)">
 
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
-        <div class="quiz-plan selected" id="qm-topic" onclick="selectQuizMode('topic')">
-          <div><div class="quiz-plan-name">✏️ Type a topic</div><div class="quiz-plan-desc">e.g. "Quiz me on integration in Maths"</div></div>
-        </div>
-        <div id="quiz-topic-input-wrap" style="display:flex;gap:8px;">
-          <input type="text" id="quiz-topic-input" placeholder="e.g. Newtons laws of motion" style="flex:1;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:var(--font-body);font-size:14px;color:var(--text);background:var(--bg);outline:none;">
-        </div>
+      <!-- Prominent topic input always visible -->
+      <div style="margin-bottom:16px;">
+        <input type="text" id="quiz-topic-input" placeholder="e.g. Newton's laws, Integration, Photosynthesis..." style="width:100%;border:2px solid var(--green);border-radius:12px;padding:13px 16px;font-family:var(--font-body);font-size:15px;color:var(--text);background:var(--bg);outline:none;">
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+        <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:2px;">Or quiz from:</p>
         <div class="quiz-plan" id="qm-pdf" onclick="selectQuizMode('pdf')">
           <div><div class="quiz-plan-name">📄 Upload a PDF</div><div class="quiz-plan-desc">AI generates quiz from your notes or past paper</div></div>
         </div>
@@ -526,16 +526,16 @@
         <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:10px;">Number of questions</p>
         <div style="display:flex;gap:6px;">
           <button class="quiz-plan" id="qc-3" onclick="selectQuizCount(3)" style="flex:1;padding:8px;justify-content:center;border-color:var(--green);background:var(--green-light);">
-            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#f5c842;">3</div><div class="quiz-plan-desc">Free</div></div>
+            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--green);">3</div><div class="quiz-plan-desc">Free</div></div>
           </button>
           <button class="quiz-plan" id="qc-10" onclick="selectQuizCount(10)" style="flex:1;padding:8px;justify-content:center;">
-            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#f5c842;">10</div><div class="quiz-plan-desc">Starter</div></div>
+            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--text-muted);">10</div><div class="quiz-plan-desc">Starter 🔒</div></div>
           </button>
           <button class="quiz-plan" id="qc-20" onclick="selectQuizCount(20)" style="flex:1;padding:8px;justify-content:center;">
-            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#f5c842;">20</div><div class="quiz-plan-desc">Scholar</div></div>
+            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--text-muted);">20</div><div class="quiz-plan-desc">Scholar 🔒</div></div>
           </button>
           <button class="quiz-plan" id="qc-50" onclick="selectQuizCount(50)" style="flex:1;padding:8px;justify-content:center;">
-            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#f5c842;">∞</div><div class="quiz-plan-desc">Pro</div></div>
+            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--text-muted);">∞</div><div class="quiz-plan-desc">Pro 🔒</div></div>
           </button>
         </div>
       </div>
@@ -952,16 +952,24 @@
   function selectQuizMode(mode) {
     quizMode = mode;
     document.querySelectorAll('#quiz-body .quiz-plan[id^="qm-"]').forEach(p => p.classList.remove('selected'));
-    document.getElementById('qm-' + mode).classList.add('selected');
-    document.getElementById('quiz-topic-input-wrap').style.display = mode === 'topic' ? 'flex' : 'none';
+    const modeEl = document.getElementById('qm-' + mode);
+    if(modeEl) modeEl.classList.add('selected');
     if(mode === 'pdf') document.getElementById('quiz-pdf-input').click();
+    else if(mode === 'subject' || mode === 'chat') {
+      // Clear topic input when switching to non-topic mode
+      const ti = document.getElementById('quiz-topic-input');
+      if(ti) ti.placeholder = 'Or type a topic above to override...';
+    }
   }
 
   function selectQuizCount(n) {
-    if(n > 3) { openModal(); return; }
+    // Just visually select — gate on plan only at Start Quiz time
     quizCount = n;
-    document.querySelectorAll('#quiz-body .quiz-plan[id^="qc-"]').forEach(p => p.classList.remove('selected'));
-    document.getElementById('qc-' + n).classList.add('selected', 'border-color:var(--green)');
+    document.querySelectorAll('#quiz-body .quiz-plan[id^="qc-"]').forEach(p => {
+      p.style.borderColor = ''; p.style.background = '';
+    });
+    const sel = document.getElementById('qc-' + n);
+    if(sel) { sel.style.borderColor = 'var(--green)'; sel.style.background = 'var(--green-light)'; }
   }
 
   let quizPdfText = '';
@@ -983,25 +991,32 @@
   }
 
   async function startQuiz() {
-    const qBody = document.getElementById('quiz-body');
-    qBody.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Generating quiz questions from easy to hard...</p></div>';
-
-    let topic = '';
+    // CRITICAL: Read topic BEFORE any DOM changes
     const topicEl = document.getElementById('quiz-topic-input');
     const typedTopic = topicEl ? topicEl.value.trim() : '';
-    if(quizMode === 'topic') {
-      if(!typedTopic) { alert('Please type a topic first! e.g. "Newton\'s laws" or "Integration in Maths"'); return; }
+
+    let topic = '';
+    if(typedTopic) {
+      // User typed something — always use it, regardless of mode selection
       topic = typedTopic;
-    }
-    else if(quizMode === 'pdf') topic = quizPdfText ? quizPdfText.substring(0, 3000) : (sub || 'General Science');
-    else if(quizMode === 'subject') {
-      if(!sub) { alert('Please select a subject from the sidebar first!'); closeQuiz(); return; }
+      quizMode = 'topic';
+    } else if(quizMode === 'pdf') {
+      topic = quizPdfText ? quizPdfText.substring(0, 3000) : (sub || 'General Science');
+    } else if(quizMode === 'subject') {
+      if(!sub) { showToast('Please select a subject from the sidebar first!'); return; }
       topic = sub;
-    }
-    else if(quizMode === 'chat') {
+    } else if(quizMode === 'chat') {
+      if(!chatHistory.length) { showToast('Ask some questions in chat first, then quiz yourself!'); return; }
       topic = chatHistory.slice(-6).join(' ').substring(0, 1000) || sub || 'General Science';
-      if(!chatHistory.length) { alert('Please ask some questions in the chat first, then come back to quiz mode!'); closeQuiz(); return; }
+    } else {
+      showToast('Type a topic above to get started!'); return;
     }
+
+    // Gate question count on plan at start time
+    if(quizCount > 3) { openModal(); return; }
+
+    const qBody = document.getElementById('quiz-body');
+    qBody.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Generating quiz: ' + topic.substring(0,50) + '...</p></div>';
 
     try {
       const res = await fetch('/api/quiz', {
@@ -1022,6 +1037,7 @@
       qBody.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Error: ' + e.message + '</p>';
     }
   }
+
 
   function showQuizQuestion() {
     const q = quizQuestions[quizCurrent];
