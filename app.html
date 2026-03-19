@@ -26,6 +26,20 @@
   .btn-home { background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px; padding: 7px 14px; font-family: var(--font-body); font-size: 13px; cursor: pointer; text-decoration: none; transition: all 0.15s; }
   .btn-home:hover { border-color: var(--green); color: var(--green); }
 
+  /* ONBOARDING */
+  .onboarding { position: fixed; inset: 0; background: var(--white); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .onboarding.hidden { display: none; }
+  .ob-box { max-width: 520px; width: 100%; text-align: center; }
+  .ob-icon { width: 72px; height: 72px; background: var(--green-light); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 20px; }
+  .ob-box h1 { font-family: var(--font-head); font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+  .ob-box p { font-size: 15px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
+  .ob-levels { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ob-level { border: 2px solid var(--border); border-radius: 16px; padding: 20px 16px; cursor: pointer; transition: all 0.15s; text-align: center; background: var(--white); }
+  .ob-level:hover { border-color: var(--green); background: var(--green-light); transform: translateY(-2px); }
+  .ob-level-icon { font-size: 32px; margin-bottom: 10px; }
+  .ob-level-name { font-family: var(--font-head); font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .ob-level-desc { font-size: 12px; color: var(--text-muted); }
+
   .layout { display: flex; flex: 1; overflow: hidden; }
 
   .sidebar { width: 220px; background: var(--white); border-right: 1px solid var(--border); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex-shrink: 0; }
@@ -34,6 +48,9 @@
   .s-btn:hover { background: var(--bg); }
   .s-btn.active { background: var(--green-light); color: var(--green-dark); font-weight: 500; }
   .s-icon { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .level-display { background: var(--green-light); border-radius: 10px; padding: 10px 12px; margin-top: 4px; display: flex; align-items: center; justify-content: space-between; }
+  .level-display span { font-size: 13px; font-weight: 600; color: var(--green-dark); }
+  .level-change { font-size: 11px; color: var(--green); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: var(--font-body); }
 
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
@@ -80,7 +97,6 @@
   .foot-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
   .foot-row span { color: var(--green); font-weight: 500; }
 
-  /* MODAL */
   .modal-wrap { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
   .modal-wrap.open { display: flex; }
   .modal { background: var(--white); border-radius: 20px; padding: 28px; max-width: 500px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -108,6 +124,37 @@
 </head>
 <body>
 
+<!-- ONBOARDING -->
+<div class="onboarding" id="onboarding">
+  <div class="ob-box">
+    <div class="ob-icon">🎓</div>
+    <h1>Welcome to StudyGenie!</h1>
+    <p>Study smart. Score higher.<br>First, tell us what level you're studying at.</p>
+    <div class="ob-levels">
+      <div class="ob-level" onclick="pickLevel('Matric')">
+        <div class="ob-level-icon">🏫</div>
+        <div class="ob-level-name">Matric</div>
+        <div class="ob-level-desc">Class 9 & 10</div>
+      </div>
+      <div class="ob-level" onclick="pickLevel('Intermediate')">
+        <div class="ob-level-icon">🎓</div>
+        <div class="ob-level-name">Intermediate</div>
+        <div class="ob-level-desc">Class 11 & 12 (FSc/FA)</div>
+      </div>
+      <div class="ob-level" onclick="pickLevel('O-Levels')">
+        <div class="ob-level-icon">🌍</div>
+        <div class="ob-level-name">O-Levels</div>
+        <div class="ob-level-desc">Cambridge IGCSE</div>
+      </div>
+      <div class="ob-level" onclick="pickLevel('A-Levels')">
+        <div class="ob-level-icon">🏆</div>
+        <div class="ob-level-name">A-Levels</div>
+        <div class="ob-level-desc">Cambridge AS & A2</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <nav>
   <a href="index.html" class="logo"><div class="logo-mark">✦</div>StudyGenie</a>
   <div class="nav-right">
@@ -120,29 +167,29 @@
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-label">Subject</div>
-    <button class="s-btn active" onclick="setSub(this,'Mathematics')"><div class="s-icon" style="background:#fef3c7">📐</div>Mathematics</button>
-    <button class="s-btn" onclick="setSub(this,'Physics')"><div class="s-icon" style="background:#e0f2fe">⚛️</div>Physics</button>
-    <button class="s-btn" onclick="setSub(this,'Chemistry')"><div class="s-icon" style="background:#f0fdf4">🧪</div>Chemistry</button>
-    <button class="s-btn" onclick="setSub(this,'Biology')"><div class="s-icon" style="background:#fdf4ff">🧬</div>Biology</button>
-    <button class="s-btn" onclick="setSub(this,'English')"><div class="s-icon" style="background:#fff7ed">📝</div>English</button>
-    <button class="s-btn" onclick="setSub(this,'Urdu')"><div class="s-icon" style="background:#fef2f2">📖</div>Urdu</button>
-    <button class="s-btn" onclick="setSub(this,'Computer Science')"><div class="s-icon" style="background:#eff6ff">💻</div>Computer Sci</button>
-    <button class="s-btn" onclick="setSub(this,'Economics')"><div class="s-icon" style="background:#f0fdf4">📊</div>Economics</button>
-    <button class="s-btn" onclick="setSub(this,'Pakistan Studies')"><div class="s-icon" style="background:#fef9c3">🏛️</div>Pak Studies</button>
-    <button class="s-btn" onclick="setSub(this,'Islamiyat')"><div class="s-icon" style="background:#ecfdf5">☪️</div>Islamiyat</button>
+    <button class="s-btn active" id="sb-Mathematics" onclick="setSub(this,'Mathematics')"><div class="s-icon" style="background:#fef3c7">📐</div>Mathematics</button>
+    <button class="s-btn" id="sb-Physics" onclick="setSub(this,'Physics')"><div class="s-icon" style="background:#e0f2fe">⚛️</div>Physics</button>
+    <button class="s-btn" id="sb-Chemistry" onclick="setSub(this,'Chemistry')"><div class="s-icon" style="background:#f0fdf4">🧪</div>Chemistry</button>
+    <button class="s-btn" id="sb-Biology" onclick="setSub(this,'Biology')"><div class="s-icon" style="background:#fdf4ff">🧬</div>Biology</button>
+    <button class="s-btn" id="sb-English" onclick="setSub(this,'English')"><div class="s-icon" style="background:#fff7ed">📝</div>English</button>
+    <button class="s-btn" id="sb-Urdu" onclick="setSub(this,'Urdu')"><div class="s-icon" style="background:#fef2f2">📖</div>Urdu</button>
+    <button class="s-btn" id="sb-Computer Science" onclick="setSub(this,'Computer Science')"><div class="s-icon" style="background:#eff6ff">💻</div>Computer Sci</button>
+    <button class="s-btn" id="sb-Economics" onclick="setSub(this,'Economics')"><div class="s-icon" style="background:#f0fdf4">📊</div>Economics</button>
+    <button class="s-btn" id="sb-Pakistan Studies" onclick="setSub(this,'Pakistan Studies')"><div class="s-icon" style="background:#fef9c3">🏛️</div>Pak Studies</button>
+    <button class="s-btn" id="sb-Islamiyat" onclick="setSub(this,'Islamiyat')"><div class="s-icon" style="background:#ecfdf5">☪️</div>Islamiyat</button>
 
-    <div class="sidebar-label">Level</div>
-    <button class="s-btn active" onclick="setLvl(this,'Matric')">🏫 Matric</button>
-    <button class="s-btn" onclick="setLvl(this,'Intermediate')">🎓 Intermediate</button>
-    <button class="s-btn" onclick="setLvl(this,'O-Levels')">🌍 O-Levels</button>
-    <button class="s-btn" onclick="setLvl(this,'A-Levels')">🏆 A-Levels</button>
+    <div class="sidebar-label" style="margin-top:12px">Your Level</div>
+    <div class="level-display">
+      <span id="level-display-text">—</span>
+      <button class="level-change" onclick="showOnboarding()">Change</button>
+    </div>
   </aside>
 
   <main class="main">
     <div class="hero" id="hero">
       <div class="hero-icon">🎓</div>
       <h1>Your AI study assistant<br>for Pakistani students</h1>
-      <p>Paste any question from your syllabus and get a clear, step-by-step answer instantly. Available 24/7.</p>
+      <p>Paste any question from your syllabus and get a clear, step-by-step answer instantly.</p>
       <div class="chips">
         <button class="chip" onclick="useChip(this)">Solve: 2x² + 5x - 3 = 0</button>
         <button class="chip" onclick="useChip(this)">Explain Newton's 3rd Law</button>
@@ -164,7 +211,7 @@
           </button>
         </div>
         <div class="foot-row">
-          <span style="color:var(--text-muted)">Subject: <span id="sub-label">Mathematics</span> · Level: <span id="lvl-label">Matric</span></span>
+          <span style="color:var(--text-muted)">Subject: <span id="sub-label">Mathematics</span> · Level: <span id="lvl-label">—</span></span>
           <span><span id="cr2">5</span> questions left today</span>
         </div>
       </div>
@@ -172,7 +219,7 @@
   </main>
 </div>
 
-<!-- MODAL -->
+<!-- PRICING MODAL -->
 <div class="modal-wrap" id="modal" onclick="outsideClose(event)">
   <div class="modal">
     <button class="modal-x" onclick="closeModal()">✕</button>
@@ -206,18 +253,32 @@
 </div>
 
 <script>
-  let credits = 5, sub = 'Mathematics', lvl = 'Matric', busy = false, started = false, plan = 'scholar';
+  let credits = 5, sub = 'Mathematics', lvl = '', busy = false, started = false, plan = 'scholar';
   const planInfo = { starter:{n:'Starter',p:'PKR 500'}, scholar:{n:'Scholar',p:'PKR 750'}, pro:{n:'Pro',p:'PKR 999'} };
 
+  function pickLevel(level) {
+    lvl = level;
+    document.getElementById('level-display-text').textContent = level;
+    document.getElementById('lvl-label').textContent = level;
+    document.getElementById('onboarding').classList.add('hidden');
+  }
+
+  function showOnboarding() {
+    document.getElementById('onboarding').classList.remove('hidden');
+  }
+
   function setSub(btn, s) {
-    document.querySelectorAll('.sidebar .s-btn').forEach(b => { if(!['Matric','Intermediate','O-Levels','A-Levels'].some(l=>b.textContent.includes(l))) b.classList.remove('active'); });
-    btn.classList.add('active'); sub = s; document.getElementById('sub-label').textContent = s;
+    document.querySelectorAll('.sidebar .s-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sub = s;
+    document.getElementById('sub-label').textContent = s;
   }
-  function setLvl(btn, l) {
-    document.querySelectorAll('.sidebar .s-btn').forEach(b => { if(['Matric','Intermediate','O-Levels','A-Levels'].some(x=>b.textContent.includes(x))) b.classList.remove('active'); });
-    btn.classList.add('active'); lvl = l; document.getElementById('lvl-label').textContent = l;
+
+  function useChip(btn) {
+    document.getElementById('q').value = btn.textContent;
+    document.getElementById('q').focus();
   }
-  function useChip(btn) { document.getElementById('q').value = btn.textContent; ask(); }
+
   function resize(el) { el.style.height='50px'; el.style.height=Math.min(el.scrollHeight,130)+'px'; }
   function onKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask();} }
 
@@ -228,7 +289,6 @@
     const b = document.createElement('div'); b.className = `bubble ${role==='ai'?'ai':'user'}`;
     if(role==='ai') b.innerHTML=html; else b.textContent=html;
     d.appendChild(av); d.appendChild(b); chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
-    return b;
   }
 
   function addLoader() {
@@ -299,8 +359,9 @@
 
   function pay() {
     closeModal();
-    addMsg('ai',`<h3>Payment coming very soon!</h3><p>You selected <strong>${planInfo[plan].n} (${planInfo[plan].p}/mo)</strong>. We're integrating Paddle so you can pay via Visa, Mastercard, JazzCash, or EasyPaisa — all in PKR. We'll notify you the moment it's live!</p>`);
+    addMsg('ai',`<h3>Payment coming very soon!</h3><p>You selected <strong>${planInfo[plan].n} (${planInfo[plan].p}/mo)</strong>. We're integrating Paddle so you can pay via Visa, Mastercard, JazzCash, or EasyPaisa — all in PKR!</p>`);
   }
 </script>
 </body>
 </html>
+
