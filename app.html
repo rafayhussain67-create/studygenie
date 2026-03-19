@@ -864,10 +864,11 @@
     qBody.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Generating quiz questions from easy to hard...</p></div>';
 
     let topic = '';
-    const typedTopic = document.getElementById('quiz-topic-input')?.value?.trim();
+    const topicEl = document.getElementById('quiz-topic-input');
+    const typedTopic = topicEl ? topicEl.value.trim() : '';
     if(quizMode === 'topic') {
-      topic = typedTopic || 'Newton\'s Laws of Motion in Physics';
       if(!typedTopic) { alert('Please type a topic first! e.g. "Newton\'s laws" or "Integration in Maths"'); return; }
+      topic = typedTopic;
     }
     else if(quizMode === 'pdf') topic = quizPdfText ? quizPdfText.substring(0, 3000) : (sub || 'General Science');
     else if(quizMode === 'subject') {
