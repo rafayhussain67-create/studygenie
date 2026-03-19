@@ -62,7 +62,6 @@
 
   /* FORMULA PAGE */
   .formula-page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
-  .formula-page.active { display: flex; }
   .formula-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
   .formula-header h2 { font-family: var(--font-head); font-size: 17px; font-weight: 700; }
   .formula-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
@@ -361,13 +360,7 @@
   <a href="index.html" class="logo"><div class="logo-mark">✦</div>StudyGenie</a>
   <div class="nav-right">
     <div class="streak-badge" id="streak-badge" title="Your study streak">🔥 <span id="streak-count">0</span></div>
-    <select class="board-select" id="board-select" onchange="setBoard(this.value)" title="Select your board">
-      <option value="">Board</option>
-      <option value="FBISE">FBISE</option>
-      <option value="Punjab">Punjab</option>
-      <option value="Sindh">Sindh</option>
-      <option value="Cambridge">Cambridge</option>
-    </select>
+
     <div class="credits-badge">⚡ <span id="cr">5</span> free left</div>
     <button class="btn-upgrade" onclick="openModal()">Upgrade — from PKR 500</button>
     <button class="btn-home" onclick="openQuiz()" style="border-color:var(--green);color:var(--green)">🧠 Quiz</button>
@@ -630,8 +623,9 @@
 </div>
 
 <script>
-  let credits = 5, sub = '', lvl = '', busy = false, started = false, plan = 'scholar';
+  let credits = 5, sub = '', lvl = '', busy = false, started = false, plan = 'scholar', board = '';
   let currentImageBase64 = null;
+  let chatHistory = [];
 
   function handleImage(input) {
     const file = input.files[0];
@@ -930,7 +924,6 @@
   let quizCurrent = 0;
   let quizScore = 0;
   let quizAnswered = false;
-  let chatHistory = [];
 
   function openQuiz() {
     document.querySelector('.layout').style.display = 'none';
@@ -1415,7 +1408,7 @@
   // ============================================
   // BOARD SELECTOR
   // ============================================
-  let board = localStorage.getItem('sg-board') || '';
+  board = localStorage.getItem('sg-board') || '';
   function setBoard(val) {
     board = val;
     localStorage.setItem('sg-board', val);
@@ -1506,11 +1499,11 @@
     document.querySelector('.layout').style.display = 'none';
     document.getElementById('fc-page').classList.remove('active');
     document.getElementById('quiz-page').classList.remove('active');
-    document.getElementById('formula-page').classList.add('active');
+    document.getElementById('formula-page').style.display = 'flex';
   }
 
   function closeFormulas() {
-    document.getElementById('formula-page').classList.remove('active');
+    document.getElementById('formula-page').style.display = 'none';
     document.querySelector('.layout').style.display = 'flex';
   }
 
