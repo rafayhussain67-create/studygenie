@@ -113,7 +113,7 @@
   /* FEATURES */
   .features { padding: 100px 5%; background: white; }
   .section-label { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 12px; }
-  .section-title { font-family: var(--font-head); font-size: clamp(28px, 4vw, 44px); font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 16px; letter-spacing: -0.02em; }
+  .section-title { font-family: var(--font-head); font-size: clamp(28px, 4vw, 44px); font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 16px; letter-spacing: -0.02em; opacity: 1 !important; }
   .section-sub { font-size: 17px; color: var(--text-muted); max-width: 520px; line-height: 1.7; margin-bottom: 60px; }
   .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
   .feature-card { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 28px; transition: all 0.2s; }
@@ -125,7 +125,7 @@
   /* SUBJECTS */
   .subjects { padding: 80px 5%; background: var(--bg); text-align: center; }
   .subjects-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 40px; }
-  .subject-pill { background: white; border: 1px solid var(--border); border-radius: 40px; padding: 10px 20px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: all 0.15s; cursor: default; }
+  .subject-pill { background: white; border: 1px solid var(--border); border-radius: 40px; padding: 10px 20px; font-size: 14px; font-weight: 600; color: var(--text) !important; display: flex; align-items: center; gap: 8px; transition: all 0.15s; cursor: default; }
   .subject-pill:hover { border-color: var(--green); color: var(--green); }
   .levels-row { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
   .level-badge { background: var(--green); color: white; border-radius: 20px; padding: 6px 18px; font-size: 13px; font-weight: 600; }
@@ -241,7 +241,7 @@
 <!-- FEATURES -->
 <section class="features" id="features">
   <div class="section-label">Why StudyGenie</div>
-  <div class="section-title">Everything you need<br>to ace your exams</div>
+  <div class="section-title" style="color:var(--green)">Everything you need<br>to ace your exams</div>
   <p class="section-sub">Built specifically for Pakistani students. No generic AI — real curriculum-aligned answers.</p>
   <div class="features-grid">
     <div class="feature-card">
@@ -304,7 +304,7 @@
 <!-- PRICING -->
 <section class="pricing" id="pricing">
   <div class="section-label">Pricing</div>
-  <div class="section-title">Simple, affordable plans</div>
+  <div class="section-title" style="color:var(--green)">Simple, affordable plans</div>
   <p class="section-sub" style="margin: 0 auto 48px;">All plans include access to all subjects and all levels. Pay in PKR.</p>
 
   <div class="pricing-grid">
