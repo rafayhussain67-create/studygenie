@@ -144,7 +144,7 @@
   .quiz-plan { border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.15s; }
   .quiz-plan:hover { border-color: var(--green); background: var(--green-light); }
   .quiz-plan.selected { border-color: var(--green); background: var(--green-light); }
-  .quiz-plan-name { font-weight: 600; font-size: 14px; }
+  .quiz-plan-name { font-weight: 700; font-size: 14px; color: var(--text); }
   .quiz-plan-desc { font-size: 12px; color: var(--text-muted); }
   .quiz-plan-badge { font-size: 11px; background: var(--green); color: white; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
   .quiz-plan-badge.locked { background: var(--border); color: var(--text-muted); }
@@ -171,14 +171,14 @@
   .quiz-btn.outline { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
 
   /* EXAM COUNTDOWN */
-  .exam-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: 8px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
+  .exam-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex-shrink: 0; min-height: 48px; }
   .exam-chips-row { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
   .exam-chip { background: var(--green-light); border: 1px solid rgba(26,158,110,0.3); border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--green-dark); display: flex; align-items: center; gap: 6px; }
   .exam-chip .days { font-family: var(--font-head); font-size: 15px; color: var(--green); }
   .exam-chip .urgent { color: #e24b4a; }
   .exam-chip-remove { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 14px; padding: 0 0 0 4px; line-height: 1; }
-  .add-exam-btn { background: none; border: 1.5px dashed var(--border); border-radius: 20px; padding: 5px 12px; font-size: 12px; color: var(--text-muted); cursor: pointer; font-family: var(--font-body); transition: all 0.15s; white-space: nowrap; }
-  .add-exam-btn:hover { border-color: var(--green); color: var(--green); }
+  .add-exam-btn { background: var(--green-light); border: 1.5px solid rgba(26,158,110,0.4); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--green-dark); cursor: pointer; font-family: var(--font-body); transition: all 0.15s; white-space: nowrap; }
+  .add-exam-btn:hover { border-color: var(--green); background: var(--green); color: white; }
   .exam-modal-wrap { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: center; justify-content: center; }
   .exam-modal-wrap.open { display: flex; }
   .exam-modal { background: var(--white); border-radius: 20px; padding: 28px; max-width: 380px; width: 90%; }
@@ -457,15 +457,18 @@
 
       <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
         <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:10px;">Number of questions</p>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:6px;">
           <button class="quiz-plan" id="qc-3" onclick="selectQuizCount(3)" style="flex:1;padding:8px;justify-content:center;border-color:var(--green);background:var(--green-light);">
-            <div style="text-align:center"><div class="quiz-plan-name">3</div><div class="quiz-plan-desc">Free</div></div>
+            <div style="text-align:center"><div class="quiz-plan-name" style="font-size:16px;font-weight:800;">3</div><div class="quiz-plan-desc">Free</div></div>
           </button>
           <button class="quiz-plan" id="qc-10" onclick="selectQuizCount(10)" style="flex:1;padding:8px;justify-content:center;">
-            <div style="text-align:center"><div class="quiz-plan-name">10</div><div class="quiz-plan-desc">Starter</div></div>
+            <div style="text-align:center"><div class="quiz-plan-name" style="font-size:16px;font-weight:800;">10</div><div class="quiz-plan-desc">Starter</div></div>
           </button>
           <button class="quiz-plan" id="qc-20" onclick="selectQuizCount(20)" style="flex:1;padding:8px;justify-content:center;">
-            <div style="text-align:center"><div class="quiz-plan-name">20</div><div class="quiz-plan-desc">Pro</div></div>
+            <div style="text-align:center"><div class="quiz-plan-name" style="font-size:16px;font-weight:800;">20</div><div class="quiz-plan-desc">Scholar</div></div>
+          </button>
+          <button class="quiz-plan" id="qc-50" onclick="selectQuizCount(50)" style="flex:1;padding:8px;justify-content:center;">
+            <div style="text-align:center"><div class="quiz-plan-name" style="font-size:16px;font-weight:800;">∞</div><div class="quiz-plan-desc">Pro</div></div>
           </button>
         </div>
       </div>
@@ -634,11 +637,13 @@
     const text = btn.textContent;
     document.getElementById('q').value = text;
     document.getElementById('q').focus();
+    document.querySelectorAll('.sidebar .s-btn').forEach(b => b.classList.remove('active'));
     const detectedSub = chipSubjects[text];
     if(detectedSub) {
-      document.querySelectorAll('.sidebar .s-btn').forEach(b => b.classList.remove('active'));
       const subBtn = document.getElementById('sb-' + detectedSub);
       if(subBtn) { subBtn.classList.add('active'); sub = detectedSub; document.getElementById('sub-label').textContent = detectedSub; }
+    } else {
+      sub = ''; document.getElementById('sub-label').textContent = 'Not selected';
     }
   }
 
