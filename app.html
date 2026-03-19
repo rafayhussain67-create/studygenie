@@ -23,6 +23,68 @@
   .dark-toggle { background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; cursor: pointer; font-size: 16px; color: var(--text-muted); transition: all 0.15s; }
   .dark-toggle:hover { border-color: var(--green); }
 
+  /* STREAK */
+  .streak-badge { background: linear-gradient(135deg, #ff6b35, #f5c842); border-radius: 20px; padding: 5px 13px; font-size: 13px; font-weight: 700; color: white; display: flex; align-items: center; gap: 5px; cursor: default; }
+
+  /* BOARD SELECTOR */
+  .board-select { border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 10px; font-family: var(--font-body); font-size: 13px; color: var(--text); background: var(--white); cursor: pointer; outline: none; transition: border-color 0.15s; }
+  .board-select:focus { border-color: var(--green); }
+
+  /* VOICE INPUT */
+  .voice-btn { width: 46px; height: 46px; background: var(--white); border: 1.5px solid var(--border); border-radius: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; font-size: 18px; }
+  .voice-btn:hover { border-color: var(--green); background: var(--green-light); }
+  .voice-btn.recording { border-color: #e24b4a; background: #fcebeb; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1)}50%{transform:scale(1.05)} }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: var(--white); padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 9999; transition: transform 0.3s; pointer-events: none; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* DIFFICULTY BADGE */
+  .diff-badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .diff-easy { background: #e6f7f1; color: #0d6b4a; }
+  .diff-medium { background: #fffbe6; color: #92700a; }
+  .diff-hard { background: #fcebeb; color: #a32d2d; }
+
+  /* ANSWER ACTION BAR */
+  .answer-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 8px 0 0; border-top: 1px solid var(--border); margin-top: 10px; }
+  .ans-btn { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 8px; background: none; cursor: pointer; font-size: 12px; color: var(--text-muted); font-family: var(--font-body); transition: all 0.12s; }
+  .ans-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+  .ans-btn.liked { border-color: var(--green); color: var(--green); background: var(--green-light); }
+  .ans-btn.disliked { border-color: #e24b4a; color: #e24b4a; background: #fcebeb; }
+
+  /* RELATED QUESTIONS */
+  .related-wrap { padding: 12px 0 0; }
+  .related-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 8px; }
+  .related-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .related-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; font-size: 12px; color: var(--text); cursor: pointer; transition: all 0.12s; font-family: var(--font-body); }
+  .related-chip:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+
+  /* FORMULA PAGE */
+  .formula-page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+  .formula-page.active { display: flex; }
+  .formula-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .formula-header h2 { font-family: var(--font-head); font-size: 17px; font-weight: 700; }
+  .formula-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+  .formula-setup { max-width: 500px; width: 100%; background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: 28px; }
+  .formula-setup h3 { font-family: var(--font-head); font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .formula-setup p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+  .formula-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .formula-field label { font-size: 13px; font-weight: 600; }
+  .formula-field input { border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-family: var(--font-body); font-size: 14px; color: var(--text); background: var(--bg); outline: none; }
+  .formula-field input:focus { border-color: var(--green); }
+  .formula-gen-btn { width: 100%; background: var(--green); color: white; border: none; border-radius: 12px; padding: 13px; font-family: var(--font-head); font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 6px; }
+  .formula-gen-btn:hover { background: var(--green-dark); }
+  .formula-sheet { max-width: 700px; width: 100%; background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 28px; }
+  .formula-sheet h3 { font-family: var(--font-head); font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--green-dark); }
+  .formula-item { border-bottom: 1px solid var(--border); padding: 12px 0; display: flex; flex-direction: column; gap: 4px; }
+  .formula-name { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+  .formula-eq { font-family: 'Courier New', monospace; font-size: 15px; color: var(--text); background: var(--bg); padding: 6px 12px; border-radius: 8px; display: inline-block; margin-top: 4px; }
+  .formula-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .formula-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .formula-copy-btn { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-family: var(--font-body); font-size: 13px; cursor: pointer; color: var(--text); }
+  .formula-copy-btn:hover { border-color: var(--green); color: var(--green); }
+
   nav { background: var(--white); border-bottom: 1px solid var(--border); height: 60px; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; flex-shrink: 0; }
   .logo { font-family: var(--font-head); font-size: 19px; font-weight: 800; color: var(--green); display: flex; align-items: center; gap: 8px; text-decoration: none; }
   .logo-mark { width: 32px; height: 32px; background: var(--green); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
@@ -298,9 +360,18 @@
 <nav>
   <a href="index.html" class="logo"><div class="logo-mark">✦</div>StudyGenie</a>
   <div class="nav-right">
+    <div class="streak-badge" id="streak-badge" title="Your study streak">🔥 <span id="streak-count">0</span></div>
+    <select class="board-select" id="board-select" onchange="setBoard(this.value)" title="Select your board">
+      <option value="">Board</option>
+      <option value="FBISE">FBISE</option>
+      <option value="Punjab">Punjab</option>
+      <option value="Sindh">Sindh</option>
+      <option value="Cambridge">Cambridge</option>
+    </select>
     <div class="credits-badge">⚡ <span id="cr">5</span> free left</div>
     <button class="btn-upgrade" onclick="openModal()">Upgrade — from PKR 500</button>
     <button class="btn-home" onclick="openQuiz()" style="border-color:var(--green);color:var(--green)">🧠 Quiz</button>
+    <button class="btn-home" onclick="openFormulas()" style="border-color:#7c3aed;color:#7c3aed">📐 Formulas</button>
     <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙</button>
     <a href="index.html" class="btn-home">← Home</a>
   </div>
@@ -370,6 +441,7 @@
               <button class="plus-menu-item" onclick="openFlashcards()"><span>📄</span> Upload PDF (flashcards)</button>
             </div>
           </div>
+          <button class="voice-btn" id="voice-btn" onclick="toggleVoice()" title="Voice input">🎤</button>
           <button class="send" id="send" onclick="ask()">
             <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
@@ -477,6 +549,32 @@
     </div>
   </div>
 </div>
+
+<!-- FORMULA SHEET PAGE -->
+<div class="formula-page" id="formula-page">
+  <div class="formula-header">
+    <h2>📐 Formula Sheet Generator</h2>
+    <button class="fc-back" onclick="closeFormulas()">← Back to Chat</button>
+  </div>
+  <div class="formula-body" id="formula-body">
+    <div class="formula-setup">
+      <h3>Generate a formula sheet</h3>
+      <p>Enter your subject and topic to get a clean, printable formula sheet</p>
+      <div class="formula-field">
+        <label>Subject</label>
+        <input type="text" id="formula-subject" placeholder="e.g. Physics, Chemistry, Maths">
+      </div>
+      <div class="formula-field">
+        <label>Topic</label>
+        <input type="text" id="formula-topic" placeholder="e.g. Kinematics, Organic Chemistry, Calculus">
+      </div>
+      <button class="formula-gen-btn" onclick="generateFormulas()">Generate Formula Sheet →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <!-- EXAM MODAL -->
 <div class="exam-modal-wrap" id="exam-modal-wrap" onclick="closeExamModalOutside(event)">
@@ -696,6 +794,23 @@
       msgRow.appendChild(b);
       wrap.appendChild(msgRow);
 
+      // Difficulty badge
+      const diff = getDifficulty(html);
+      const diffBadge = document.createElement('span');
+      diffBadge.className = `diff-badge diff-${diff}`;
+      diffBadge.textContent = diff.charAt(0).toUpperCase() + diff.slice(1);
+      b.prepend(diffBadge);
+
+      // Answer action bar
+      const actionBar = document.createElement('div');
+      actionBar.className = 'answer-actions';
+      actionBar.innerHTML = `
+        <button class="ans-btn" id="like-${msgId}" onclick="rateAnswer('${msgId}','like')">👍 <span id="like-count-${msgId}">0</span></button>
+        <button class="ans-btn" id="dislike-${msgId}" onclick="rateAnswer('${msgId}','dislike')">👎</button>
+        <button class="ans-btn" onclick="regenerateAnswer('${msgId}')">🔄 Regenerate</button>
+        <button class="ans-btn" onclick="copyAnswer('${msgId}')">📋 Copy</button>`;
+      b.appendChild(actionBar);
+
       const actions = document.createElement('div');
       actions.className = 'msg-actions';
       actions.style.position = 'relative';
@@ -787,7 +902,7 @@
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q || 'Solve this question from the image', subject: sub, level: lvl, image: currentImageBase64 })
+        body: JSON.stringify({ question: q || 'Solve this question from the image', subject: sub, level: lvl, image: currentImageBase64, board: board })
       });
       const data = await res.json();
       removeLoader();
@@ -800,6 +915,8 @@
 
     busy=false;
     document.getElementById('send').disabled=false;
+    updateStreak();
+    generateRelated(q);
 
     if(credits===0) {
       setTimeout(()=>{ addMsg('ai','<h3>You\'ve used all 5 free questions!</h3><p>Upgrade to keep studying. Plans start from just <strong>PKR 500/month</strong> — click Upgrade above!</p>'); },800);
@@ -1208,6 +1325,239 @@
   }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script>pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";</script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  // ============================================
+  // TOAST
+  // ============================================
+  function showToast(msg, duration=2000) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  // ============================================
+  // COPY ANSWER
+  // ============================================
+  function copyAnswer(msgId) {
+    const bubble = document.getElementById(msgId);
+    const text = bubble ? bubble.innerText : '';
+    navigator.clipboard.writeText(text).then(() => showToast('✅ Copied to clipboard!'));
+  }
+
+  // ============================================
+  // DIFFICULTY BADGE
+  // ============================================
+  function getDifficulty(html) {
+    const text = html.replace(/<[^>]*>/g,'');
+    const words = text.split(' ').length;
+    const hardWords = ['derive','prove','integration','differentiation','thermodynamics','quantum','electromagnetic','molecular','equilibrium','electrochemical','photosynthesis','chromosomes','constitutional','jurisprudence'];
+    const medWords = ['explain','describe','calculate','determine','compare','define','analyse','evaluate'];
+    const hasHard = hardWords.some(w => text.toLowerCase().includes(w));
+    const hasMed = medWords.some(w => text.toLowerCase().includes(w));
+    if(hasHard || words > 200) return 'hard';
+    if(hasMed || words > 100) return 'medium';
+    return 'easy';
+  }
+
+  // ============================================
+  // ANSWER RATING
+  // ============================================
+  const ratings = {};
+  function rateAnswer(msgId, type) {
+    if(ratings[msgId]) return;
+    ratings[msgId] = type;
+    const likeBtn = document.getElementById('like-' + msgId);
+    const dislikeBtn = document.getElementById('dislike-' + msgId);
+    if(type === 'like') { likeBtn.classList.add('liked'); showToast('👍 Thanks for the feedback!'); }
+    else { dislikeBtn.classList.add('disliked'); showToast('👎 Got it — we'll do better!'); }
+  }
+
+  async function regenerateAnswer(msgId) {
+    const bubble = document.getElementById(msgId);
+    if(!bubble) return;
+    const lastQ = chatHistory[chatHistory.length-1] || 'Explain again';
+    bubble.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: lastQ + ' (please explain differently)', subject: sub, level: lvl })
+      });
+      const data = await res.json();
+      bubble.innerHTML = data.answer || 'Sorry, could not regenerate.';
+    } catch(e) { bubble.innerHTML = 'Error regenerating. Please try again.'; }
+  }
+
+  // ============================================
+  // STUDY STREAK
+  // ============================================
+  function updateStreak() {
+    const today = new Date().toDateString();
+    const data = JSON.parse(localStorage.getItem('sg-streak') || '{"streak":0,"longest":0,"last":""}');
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    if(data.last === today) return;
+    if(data.last === yesterday.toDateString()) { data.streak += 1; }
+    else if(data.last !== today) { data.streak = 1; }
+    data.longest = Math.max(data.longest, data.streak);
+    data.last = today;
+    localStorage.setItem('sg-streak', JSON.stringify(data));
+    document.getElementById('streak-count').textContent = data.streak + ' day' + (data.streak !== 1 ? 's' : '');
+  }
+
+  function loadStreak() {
+    const data = JSON.parse(localStorage.getItem('sg-streak') || '{"streak":0,"longest":0,"last":""}');
+    const el = document.getElementById('streak-count');
+    if(el) el.textContent = data.streak + ' day' + (data.streak !== 1 ? 's' : '');
+  }
+  loadStreak();
+
+  // ============================================
+  // BOARD SELECTOR
+  // ============================================
+  let board = localStorage.getItem('sg-board') || '';
+  function setBoard(val) {
+    board = val;
+    localStorage.setItem('sg-board', val);
+    showToast('📋 Board set to ' + (val || 'default'));
+  }
+  const boardEl = document.getElementById('board-select');
+  if(boardEl && board) boardEl.value = board;
+
+  // ============================================
+  // VOICE INPUT
+  // ============================================
+  let recognition = null;
+  let isRecording = false;
+  function toggleVoice() {
+    if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      showToast('❌ Voice input not supported in this browser');
+      return;
+    }
+    if(isRecording) {
+      recognition.stop();
+      isRecording = false;
+      document.getElementById('voice-btn').classList.remove('recording');
+      document.getElementById('voice-btn').textContent = '🎤';
+      return;
+    }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onstart = () => {
+      isRecording = true;
+      document.getElementById('voice-btn').classList.add('recording');
+      document.getElementById('voice-btn').textContent = '⏹️';
+      showToast('🎤 Listening...');
+    };
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      document.getElementById('q').value = transcript;
+      showToast('✅ Voice captured!');
+    };
+    recognition.onerror = () => showToast('❌ Could not hear you. Try again.');
+    recognition.onend = () => {
+      isRecording = false;
+      document.getElementById('voice-btn').classList.remove('recording');
+      document.getElementById('voice-btn').textContent = '🎤';
+    };
+    recognition.start();
+  }
+
+  // ============================================
+  // RELATED QUESTIONS
+  // ============================================
+  async function generateRelated(question) {
+    if(!question) return;
+    try {
+      const res = await fetch('/api/related', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, subject: sub, level: lvl })
+      });
+      const data = await res.json();
+      if(data.questions && data.questions.length) {
+        const chat = document.getElementById('chat');
+        const relDiv = document.createElement('div');
+        relDiv.style.maxWidth = '740px';
+        relDiv.style.width = '100%';
+        relDiv.style.margin = '0 auto';
+        relDiv.className = 'related-wrap';
+        relDiv.innerHTML = `<div class="related-label">You might also want to ask</div>
+          <div class="related-chips">${data.questions.map(q => `<button class="related-chip" onclick="useRelated(this)">${q}</button>`).join('')}</div>`;
+        chat.appendChild(relDiv);
+        chat.scrollTop = chat.scrollHeight;
+      }
+    } catch(e) {}
+  }
+
+  function useRelated(btn) {
+    document.getElementById('q').value = btn.textContent;
+    document.getElementById('q').focus();
+    btn.closest('.related-wrap').remove();
+  }
+
+  // ============================================
+  // FORMULA SHEET
+  // ============================================
+  function openFormulas() {
+    document.querySelector('.layout').style.display = 'none';
+    document.getElementById('fc-page').classList.remove('active');
+    document.getElementById('quiz-page').classList.remove('active');
+    document.getElementById('formula-page').classList.add('active');
+  }
+
+  function closeFormulas() {
+    document.getElementById('formula-page').classList.remove('active');
+    document.querySelector('.layout').style.display = 'flex';
+  }
+
+  async function generateFormulas() {
+    const subject = document.getElementById('formula-subject').value.trim();
+    const topic = document.getElementById('formula-topic').value.trim();
+    if(!subject || !topic) { showToast('Please enter both subject and topic'); return; }
+    const body = document.getElementById('formula-body');
+    body.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Generating formula sheet...</p></div>';
+    try {
+      const res = await fetch('/api/formulas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, topic, level: lvl })
+      });
+      const data = await res.json();
+      if(data.formulas) renderFormulaSheet(data.formulas, subject, topic);
+      else body.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Could not generate formula sheet. Please try again.</p>';
+    } catch(e) {
+      body.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Error: ' + e.message + '</p>';
+    }
+  }
+
+  function renderFormulaSheet(formulas, subject, topic) {
+    const body = document.getElementById('formula-body');
+    const items = formulas.map(f => `
+      <div class="formula-item">
+        <div class="formula-name">${f.name}</div>
+        <div class="formula-eq">${f.formula}</div>
+        ${f.description ? `<div class="formula-desc">${f.description}</div>` : ''}
+      </div>`).join('');
+    body.innerHTML = `
+      <div class="formula-sheet">
+        <h3>📐 ${subject} — ${topic}</h3>
+        ${items}
+        <div class="formula-actions">
+          <button class="formula-copy-btn" onclick="copyFormulaSheet()">📋 Copy all formulas</button>
+          <button class="formula-copy-btn" onclick="openFormulas()">🔄 Generate another</button>
+        </div>
+      </div>`;
+  }
+
+  function copyFormulaSheet() {
+    const sheet = document.querySelector('.formula-sheet');
+    if(sheet) navigator.clipboard.writeText(sheet.innerText).then(() => showToast('✅ Formula sheet copied!'));
+  }
+
+</script>
 </body>
 </html>
