@@ -102,8 +102,10 @@
   .ob-box h1 { font-family: var(--font-head); font-size: 26px; font-weight: 800; margin-bottom: 8px; }
   .ob-box p { font-size: 15px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
   .ob-levels { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .ob-level { border: 2px solid var(--border); border-radius: 16px; padding: 20px 16px; cursor: pointer; transition: all 0.15s; text-align: center; background: var(--white); }
-  .ob-level:hover { border-color: var(--green); background: var(--green-light); transform: translateY(-2px); }
+  .ob-level { border: 2px solid #d1d5db; border-radius: 16px; padding: 20px 16px; cursor: pointer; transition: all 0.15s; text-align: center; background: #f3f4f6; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .ob-level:hover { border-color: var(--green); background: var(--green-light); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(26,158,110,0.15); }
+  body.dark .ob-level { background: #1e2535; border-color: #3d4a5c; }
+  body.dark .ob-level:hover { border-color: var(--green); background: var(--green-light); }
   .ob-level-icon { font-size: 32px; margin-bottom: 10px; }
   .ob-level-name { font-family: var(--font-head); font-size: 16px; font-weight: 700; margin-bottom: 4px; }
   .ob-level-desc { font-size: 12px; color: var(--text-muted); }
@@ -699,10 +701,21 @@
 
   function pickLevel(level) {
     lvl = level;
+    localStorage.setItem('sg-level', level);
     document.getElementById('level-display-text').textContent = level;
     document.getElementById('lvl-label').textContent = level;
     document.getElementById('onboarding').classList.add('hidden');
     updateChips(level);
+  }
+
+  // Auto-skip onboarding if level was already chosen
+  const savedLevel = localStorage.getItem('sg-level');
+  if (savedLevel) {
+    lvl = savedLevel;
+    document.getElementById('level-display-text').textContent = savedLevel;
+    document.getElementById('lvl-label').textContent = savedLevel;
+    document.getElementById('onboarding').classList.add('hidden');
+    updateChips(savedLevel);
   }
 
   function showOnboarding() {
@@ -1519,15 +1532,15 @@
       });
       const data = await res.json();
       if(data.mismatch) {
-        body.innerHTML = \`
+        body.innerHTML = `
           <div class="formula-setup">
             <div style="text-align:center;padding:20px">
               <div style="font-size:48px;margin-bottom:12px">⚠️</div>
               <h3 style="color:#e24b4a;margin-bottom:8px">Subject Mismatch</h3>
-              <p style="color:var(--text-muted);margin-bottom:20px">\${data.error}</p>
+              <p style="color:var(--text-muted);margin-bottom:20px">${data.error}</p>
               <button class="formula-gen-btn" onclick="openFormulas()" style="max-width:200px;margin:0 auto">Try Again →</button>
             </div>
-          </div>\`;
+          </div>`;
       } else if(data.formulas) {
         renderFormulaSheet(data.formulas, subject, topic);
       } else {
