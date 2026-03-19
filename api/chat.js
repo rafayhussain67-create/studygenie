@@ -12,15 +12,22 @@ export default async function handler(req, res) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
-  const systemPrompt = `You are StudyGenie, an AI tutor for Pakistani ${level} students studying ${subject}. Give clear step-by-step answers aligned with the Pakistani curriculum (Federal Board, Punjab Board, Sindh Board, Cambridge O/A Levels). Use simple English.
+  const systemPrompt = `You are StudyGenie, an AI tutor for Pakistani ${level} students studying ${subject}.
 
-Format your response as HTML:
-- Use <h3> for the main answer heading
-- Wrap each step in: <div class="step-block"><div class="step-label">Step N</div>content</div>
-- Use <div class="formula-box">formula here</div> for math formulas
-- End with a short encouraging <p> tag
+CRITICAL RULES - YOU MUST FOLLOW THESE EXACTLY:
+1. ONLY output valid HTML. Never use Markdown, never use ## headings, never use ** bold, never use LaTeX or $...$ math notation.
+2. For EVERY question in the image or text, use this EXACT structure:
 
-Be concise, accurate, and friendly.`;
+<h3>Question N: [brief question title]</h3>
+<div class="step-block"><div class="step-label">Step 1</div>explanation here</div>
+<div class="step-block"><div class="step-label">Step 2</div>explanation here</div>
+<div class="formula-box">formula or answer here (use plain text, not LaTeX)</div>
+
+3. Write ALL math in plain text: use "64/56" not "$\\frac{64}{56}$", use "x^2" not "$x^{2}$", use "sqrt(x)" not "$\\sqrt{x}$"
+4. Number EVERY question clearly as Question 1, Question 2, Question 3 etc
+5. End with: <p>Keep it up! You are doing great.</p>
+
+Pakistani curriculum context: Federal Board, Punjab Board, Sindh Board, Cambridge O/A Levels. Keep explanations simple and clear.`;
 
   try {
     let messages;
@@ -30,7 +37,7 @@ Be concise, accurate, and friendly.`;
         role: 'user',
         content: [
           { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${image}` } },
-          { type: 'text', text: `${systemPrompt}\n\nSolve the question shown in this image. ${question ? 'Additional context: ' + question : ''}` }
+          { type: 'text', text: `${systemPrompt}\n\nSolve ALL questions shown in this image. Number each one clearly. ${question ? 'Extra context: ' + question : ''}` }
         ]
       }];
     } else {
@@ -48,7 +55,7 @@ Be concise, accurate, and friendly.`;
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
-      body: JSON.stringify({ model, messages, max_tokens: 1000, temperature: 0.7 })
+      body: JSON.stringify({ model, messages, max_tokens: 2000, temperature: 0.3 })
     });
 
     const data = await response.json();
@@ -58,8 +65,18 @@ Be concise, accurate, and friendly.`;
       return res.status(500).json({ error: data.error?.message || 'Groq error' });
     }
 
-    const text = data.choices?.[0]?.message?.content;
+    let text = data.choices?.[0]?.message?.content;
     if (!text) return res.status(500).json({ error: 'No response text' });
+
+    // Strip any markdown that slips through
+    text = text
+      .replace(/^#{1,3} (.+)$/gm, '<h3>$1</h3>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\$\\frac\{([^}]+)\}\{([^}]+)\}\$/g, '$1/$2')
+      .replace(/\$\\sqrt\{([^}]+)\}\$/g, 'sqrt($1)')
+      .replace(/\$([^$]+)\$/g, '$1')
+      .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1/$2')
+      .replace(/\\sqrt\{([^}]+)\}/g, 'sqrt($1)');
 
     return res.status(200).json({ answer: text });
   } catch (err) {
