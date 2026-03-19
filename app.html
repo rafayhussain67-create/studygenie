@@ -864,10 +864,20 @@
     qBody.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Generating quiz questions from easy to hard...</p></div>';
 
     let topic = '';
-    if(quizMode === 'topic') topic = document.getElementById('quiz-topic-input')?.value || sub || 'General';
-    else if(quizMode === 'pdf') topic = quizPdfText ? 'based on this content: ' + quizPdfText.substring(0, 2000) : sub || 'General';
-    else if(quizMode === 'subject') topic = sub || 'General';
-    else if(quizMode === 'chat') topic = chatHistory.slice(-6).join(' ').substring(0, 1000) || sub || 'General';
+    const typedTopic = document.getElementById('quiz-topic-input')?.value?.trim();
+    if(quizMode === 'topic') {
+      topic = typedTopic || 'Newton\'s Laws of Motion in Physics';
+      if(!typedTopic) { alert('Please type a topic first! e.g. "Newton\'s laws" or "Integration in Maths"'); return; }
+    }
+    else if(quizMode === 'pdf') topic = quizPdfText ? quizPdfText.substring(0, 3000) : (sub || 'General Science');
+    else if(quizMode === 'subject') {
+      if(!sub) { alert('Please select a subject from the sidebar first!'); closeQuiz(); return; }
+      topic = sub;
+    }
+    else if(quizMode === 'chat') {
+      topic = chatHistory.slice(-6).join(' ').substring(0, 1000) || sub || 'General Science';
+      if(!chatHistory.length) { alert('Please ask some questions in the chat first, then come back to quiz mode!'); closeQuiz(); return; }
+    }
 
     try {
       const res = await fetch('/api/quiz', {
