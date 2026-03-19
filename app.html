@@ -938,10 +938,57 @@
   let quizScore = 0;
   let quizAnswered = false;
 
+  function getQuizSetupHTML() {
+    return `
+    <div class="quiz-setup">
+      <h3>🧠 Test your knowledge</h3>
+      <p>What do you want to be quizzed on?</p>
+      <input type="file" id="quiz-pdf-input" accept=".pdf" style="display:none" onchange="handleQuizPDF(this)">
+      <div style="margin-bottom:16px;">
+        <input type="text" id="quiz-topic-input" placeholder="e.g. Newton's laws, Integration, Photosynthesis..." style="width:100%;border:2px solid var(--green);border-radius:12px;padding:13px 16px;font-family:var(--font-body);font-size:15px;color:var(--text);background:var(--bg);outline:none;">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+        <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:2px;">Or quiz from:</p>
+        <div class="quiz-plan" id="qm-pdf" onclick="selectQuizMode('pdf')">
+          <div><div class="quiz-plan-name">📄 Upload a PDF</div><div class="quiz-plan-desc">AI generates quiz from your notes or past paper</div></div>
+        </div>
+        <div class="quiz-plan" id="qm-subject" onclick="selectQuizMode('subject')">
+          <div><div class="quiz-plan-name">📚 By subject</div><div class="quiz-plan-desc">General quiz on your selected subject</div></div>
+        </div>
+        <div class="quiz-plan" id="qm-chat" onclick="selectQuizMode('chat')">
+          <div><div class="quiz-plan-name">💬 From my chat</div><div class="quiz-plan-desc">Quiz on topics you just studied in the chat</div></div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:10px;">Number of questions</p>
+        <div style="display:flex;gap:6px;">
+          <button class="quiz-plan" id="qc-3" onclick="selectQuizCount(3)" style="flex:1;padding:8px;justify-content:center;border-color:var(--green);background:var(--green-light);">
+            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--green);">3</div><div class="quiz-plan-desc">Free</div></div>
+          </button>
+          <button class="quiz-plan" id="qc-10" onclick="selectQuizCount(10)" style="flex:1;padding:8px;justify-content:center;">
+            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--text-muted);">10</div><div class="quiz-plan-desc">Starter 🔒</div></div>
+          </button>
+          <button class="quiz-plan" id="qc-20" onclick="selectQuizCount(20)" style="flex:1;padding:8px;justify-content:center;">
+            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--text-muted);">20</div><div class="quiz-plan-desc">Scholar 🔒</div></div>
+          </button>
+          <button class="quiz-plan" id="qc-50" onclick="selectQuizCount(50)" style="flex:1;padding:8px;justify-content:center;">
+            <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--text-muted);">∞</div><div class="quiz-plan-desc">Pro 🔒</div></div>
+          </button>
+        </div>
+      </div>
+      <button class="quiz-start-btn" onclick="startQuiz()">Start Quiz →</button>
+    </div>`;
+  }
+
   function openQuiz() {
     document.querySelector('.layout').style.display = 'none';
     document.getElementById('fc-page').classList.remove('active');
     document.getElementById('quiz-page').classList.add('active');
+    document.getElementById('quiz-body').innerHTML = getQuizSetupHTML();
+    document.getElementById('quiz-progress-fill').style.width = '0%';
+    document.getElementById('quiz-progress-text').textContent = '0 / 0';
+    quizMode = 'topic';
+    quizCount = 3;
   }
 
   function closeQuiz() {
