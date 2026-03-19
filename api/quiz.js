@@ -6,7 +6,8 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { topic, level, count, mode } = req.body;
+  const { topic, level, count, mode, seed } = req.body;
+  const randomSeed = seed || Date.now();
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
@@ -17,6 +18,7 @@ export default async function handler(req, res) {
 STRICT INSTRUCTION: Questions must be ONLY about: ${topic}
 Do NOT deviate from this topic under any circumstances.
 Mode: ${mode || 'topic'}
+Session ID: ${randomSeed} — use this to ensure DIFFERENT questions from any previous session on this topic. Never repeat the same questions.
 
 IMPORTANT - Difficulty progression (required):
 - Question 1: Very easy (basic definition or recall)
@@ -54,7 +56,7 @@ Rules:
         model: 'llama-3.3-70b-versatile',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 2000,
-        temperature: 0.5
+        temperature: 0.9
       })
     });
 
