@@ -325,6 +325,21 @@
   }
   function removeLoader() { const el=document.getElementById('loader'); if(el) el.remove(); }
 
+  function detectSubject(q) {
+    const text = q.toLowerCase();
+    if(/newton|force|velocity|acceleration|gravity|momentum|energy|wave|optics|electric|circuit|magnet|thermodynamic|kinetic|potential|pressure|density|refraction|lens|mirror|quantum|nuclear|radioactive|current|voltage|resistance|power|frequency|amplitude|capacitor|inductor|transformer|photon|electron|proton|neutron|atom|molecule|bond|orbit|planet|motion|friction|torque|pendulum|spring|oscillat|doppler|sound|light|heat|temperature|thermal/.test(text)) return 'Physics';
+    if(/acid|base|ph|titration|ionic|covalent|bond|electron|proton|neutron|atom|molecule|element|compound|mixture|oxidation|reduction|redox|organic|alkane|alkene|polymer|reaction|catalyst|equilibrium|mole|concentration|solution|solvent|solute|periodic|halogen|alkali|metal|nonmetal|electroly|galvanic|enthalpy|entropy|gibbs|activation|enzyme|chromatography|distillation|precipitation|crystallis|hydrolysis|saponification|ester|amine|amino|carboxyl|aldehyde|ketone|alcohol|phenol/.test(text)) return 'Chemistry';
+    if(/cell|photosynthesis|respiration|dna|rna|gene|chromosome|mitosis|meiosis|evolution|natural selection|ecosystem|food chain|organism|bacteria|virus|fungi|plant|animal|tissue|organ|digest|circulat|nervous|hormone|enzyme|protein|carbohydrate|lipid|osmosis|diffusion|transpiration|germination|pollination|fertilisation|taxonomy|species|habitat|biodiversity|parasite|symbiosis|antibiotic|vaccine|immune|blood|heart|lung|kidney|liver|neuron|synapse|reflex/.test(text)) return 'Biology';
+    if(/gdp|inflation|supply|demand|market|economy|trade|fiscal|monetary|unemployment|elasticity|equilibrium|consumer|producer|microeconom|macroeconom|aggregate|multiplier|investment|export|import|balance of payment|exchange rate|subsidies|tariff|tax|revenue|cost|profit|monopoly|oligopoly|competition|wage|labour|capital|entrepreneur|opportunity cost/.test(text)) return 'Economics';
+    if(/pakistan|mughal|british|independence|partition|constitution|province|sindh|punjab|balochistan|kpk|islamabad|karachi|lahore|quetta|peshawar|jinnah|allama|iqbal|ayub|bhutto|zia|benazir|musharraf|geography|climate|river|indus|mountain|himalaya|karakoram|thar|agriculture|industry|population/.test(text)) return 'Pakistan Studies';
+    if(/quran|hadith|islam|prophet|allah|sunnah|fiqh|tawheed|prayer|namaz|zakat|hajj|fasting|ramadan|mosque|masjid|wudu|salah|jihad|ummah|shariah|halal|haram|muslim|ibadah/.test(text)) return 'Islamiyat';
+    if(/essay|paragraph|grammar|vocabulary|comprehension|tense|verb|noun|adjective|adverb|preposition|conjunction|punctuation|metaphor|simile|alliteration|poem|prose|fiction|novel|character|plot|theme|narrative|writing|reading|listening|speaking|sentence|clause|phrase/.test(text)) return 'English';
+    if(/urdu|adab|shairi|ghazal|nazm|afsana|kahani|novel|drama|safarnama|khutoot|mazmoon|inshaiye|qasida|marsiya|rubai|masnavi|tazkira|dastan/.test(text)) return 'Urdu';
+    if(/program|algorithm|code|variable|loop|function|array|database|html|css|javascript|python|java|c\+\+|software|hardware|network|internet|binary|decimal|hexadecimal|bit|byte|cpu|ram|memory|storage|operating system|compiler|interpreter|recursion|data structure|sorting|searching/.test(text)) return 'Computer Science';
+    if(/algebra|geometry|trigonometry|calculus|differentiat|integrat|equation|function|graph|matrix|vector|probability|statistics|arithmetic|fraction|decimal|percentage|ratio|proportion|theorem|proof|coordinate|polynomial|quadratic|linear|logarithm|exponent|sequence|series|binomial|complex number|set|venn|number/.test(text)) return 'Mathematics';
+    return null;
+  }
+
   async function ask() {
     if(busy) return;
     const inp = document.getElementById('q');
@@ -341,6 +356,13 @@
       document.getElementById('hero').style.display='none';
       document.getElementById('chat').classList.add('active');
       started=true;
+    }
+
+    const detected = detectSubject(q);
+    if(detected) {
+      document.querySelectorAll('.sidebar .s-btn').forEach(b => b.classList.remove('active'));
+      const subBtn = document.getElementById('sb-' + detected);
+      if(subBtn) { subBtn.classList.add('active'); sub = detected; document.getElementById('sub-label').textContent = detected; }
     }
 
     addMsg('user', q);
