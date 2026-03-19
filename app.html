@@ -264,11 +264,55 @@
   let credits = 5, sub = 'Mathematics', lvl = '', busy = false, started = false, plan = 'scholar';
   const planInfo = { starter:{n:'Starter',p:'PKR 500'}, scholar:{n:'Scholar',p:'PKR 750'}, pro:{n:'Pro',p:'PKR 999'} };
 
+  const levelChips = {
+    'Matric': [
+      'Solve: 2x² + 5x - 3 = 0',
+      'What is Newton\'s 2nd Law?',
+      'Difference between mitosis and meiosis',
+      'What is an ionic bond?',
+      'Explain the water cycle',
+      'What is GDP?'
+    ],
+    'Intermediate': [
+      'Differentiate sin(x) + cos(x)',
+      'Explain Bohr\'s atomic model',
+      'What is Le Chatelier\'s principle?',
+      'Explain photosynthesis in detail',
+      'What is aggregate demand?',
+      'Explain Pakistan\'s federal structure'
+    ],
+    'O-Levels': [
+      'Solve simultaneous equations: 2x+y=7, x-y=2',
+      'Explain thermal expansion of solids',
+      'What is the role of enzymes in digestion?',
+      'Difference between oxidation and reduction',
+      'Explain demand and supply curves',
+      'What is the water cycle? (Cambridge syllabus)'
+    ],
+    'A-Levels': [
+      'Integrate x²e^x using integration by parts',
+      'Derive the equation of motion from Newton\'s laws',
+      'Explain the mechanism of SN1 vs SN2 reactions',
+      'What is the Hardy-Weinberg principle?',
+      'Explain Keynesian vs Monetarist economics',
+      'Differentiate between mitosis and meiosis at molecular level'
+    ]
+  };
+
+  function updateChips(level) {
+    const chips = levelChips[level] || levelChips['Matric'];
+    const chipsContainer = document.querySelector('.chips');
+    chipsContainer.innerHTML = chips.map(q => 
+      `<button class="chip" onclick="useChip(this)">${q}</button>`
+    ).join('');
+  }
+
   function pickLevel(level) {
     lvl = level;
     document.getElementById('level-display-text').textContent = level;
     document.getElementById('lvl-label').textContent = level;
     document.getElementById('onboarding').classList.add('hidden');
+    updateChips(level);
   }
 
   function showOnboarding() {
