@@ -6,27 +6,41 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { subject, level, count } = req.body;
+  const { topic, level, count, mode } = req.body;
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
-  const prompt = `Generate exactly ${count || 3} multiple choice questions for a Pakistani ${level} student studying ${subject}.
+  const n = count || 3;
 
-Return ONLY a valid JSON array with no markdown or backticks:
+  const prompt = `Generate exactly ${n} multiple choice questions for a Pakistani ${level || 'Matric'} student.
+
+Topic/Subject: ${topic || 'General Science'}
+Mode: ${mode || 'topic'}
+
+IMPORTANT - Difficulty progression (required):
+- Question 1: Very easy (basic definition or recall)
+- Question 2: Easy (simple application)  
+- Question 3: Medium (understanding concept)
+- Question 4-7: Medium-Hard (applying knowledge)
+- Last questions: Hard (exam-style, tricky options)
+
+Return ONLY a valid JSON array, no markdown, no backticks:
 [
   {
-    "question": "What is Newton's First Law of Motion?",
-    "options": ["An object stays at rest unless acted upon by force", "Force equals mass times acceleration", "Every action has an equal reaction", "Objects fall at the same speed"],
-    "correct": 0
+    "question": "What is the definition of velocity?",
+    "options": ["Speed in a specific direction", "Distance divided by time", "Rate of change of acceleration", "Force per unit mass"],
+    "correct": 0,
+    "difficulty": "easy"
   }
 ]
 
 Rules:
-- Each question must have exactly 4 options
+- Exactly 4 options per question
 - "correct" is the index (0-3) of the correct answer
-- Questions must be relevant to ${level} ${subject} Pakistani curriculum
-- Mix easy and medium difficulty
-- Make wrong answers plausible but clearly incorrect`;
+- Questions must match Pakistani ${level} curriculum
+- Wrong answers must be plausible but clearly incorrect to someone who knows the topic
+- If topic includes PDF content, base questions strictly on that content
+- Progress from easy to hard across all ${n} questions`;
 
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -38,8 +52,8 @@ Rules:
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
         messages: [{ role: 'user', content: prompt }],
-        max_tokens: 1500,
-        temperature: 0.6
+        max_tokens: 2000,
+        temperature: 0.5
       })
     });
 
