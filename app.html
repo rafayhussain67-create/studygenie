@@ -1015,6 +1015,8 @@
     // Gate question count on plan at start time
     if(quizCount > 3) { openModal(); return; }
 
+    lastQuizTopic = topic;
+    const seed = Date.now();
     const qBody = document.getElementById('quiz-body');
     qBody.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Generating quiz: ' + topic.substring(0,50) + '...</p></div>';
 
@@ -1022,7 +1024,7 @@
       const res = await fetch('/api/quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, level: lvl || 'Matric', count: quizCount, mode: quizMode })
+        body: JSON.stringify({ topic, level: lvl || 'Matric', count: quizCount, mode: quizMode, seed })
       });
       const data = await res.json();
       if(data.questions) {
@@ -1078,26 +1080,57 @@
     else showQuizQuestion();
   }
 
+  // Store last used topic so Try Again can re-fetch with it
+  let lastQuizTopic = '';
+
   function showQuizResult() {
     const total = quizQuestions.length;
     const pct = Math.round((quizScore / total) * 100);
     document.getElementById('quiz-progress-fill').style.width = '100%';
     document.getElementById('quiz-progress-text').textContent = total + ' / ' + total;
-    let msg = pct === 100 ? 'Perfect score! Amazing!' : pct >= 70 ? 'Great job! Keep it up!' : pct >= 40 ? 'Good effort! Review the topics again.' : 'Keep studying! You\'ll get there.';
+    let msg = pct === 100 ? 'Perfect score! 🎉 Amazing!' : pct >= 70 ? 'Great job! Keep it up! 💪' : pct >= 40 ? 'Good effort! Review the topics again.' : "Keep studying! You'll get there.";
+    const emoji = pct === 100 ? '🏆' : pct >= 70 ? '⭐' : pct >= 40 ? '📚' : '💡';
     document.getElementById('quiz-body').innerHTML = `
       <div class="quiz-result">
         <div class="quiz-score-circle">
           <div class="quiz-score-num">${pct}%</div>
           <div class="quiz-score-label">SCORE</div>
         </div>
-        <h3>${msg}</h3>
+        <h3>${emoji} ${msg}</h3>
         <p>You got ${quizScore} out of ${total} questions correct</p>
+        ${lastQuizTopic ? `<p style="font-size:12px;color:var(--green);margin-top:-12px;margin-bottom:16px;">Topic: ${lastQuizTopic}</p>` : ''}
         <div class="quiz-result-btns">
           <button class="quiz-btn outline" onclick="closeQuiz()">Back to Chat</button>
-          <button class="quiz-btn" onclick="startQuiz()">Try Again →</button>
+          <button class="quiz-btn" onclick="retryQuiz()">Try Again →</button>
         </div>
       </div>`;
   }
+
+  // Retry: re-run same topic but forces new random questions via seed
+  async function retryQuiz() {
+    if(!lastQuizTopic) { openQuiz(); return; }
+    const qBody = document.getElementById('quiz-body');
+    qBody.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Generating new questions on: ' + lastQuizTopic.substring(0,50) + '...</p></div>';
+    try {
+      const res = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic: lastQuizTopic, level: lvl || 'Matric', count: quizCount, mode: quizMode, seed: Date.now() })
+      });
+      const data = await res.json();
+      if(data.questions) {
+        quizQuestions = data.questions;
+        quizCurrent = 0;
+        quizScore = 0;
+        showQuizQuestion();
+      } else {
+        qBody.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Could not generate quiz. Please try again.</p>';
+      }
+    } catch(e) {
+      qBody.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Error: ' + e.message + '</p>';
+    }
+  }
+
 
   // EXAM COUNTDOWN
   let exams = JSON.parse(localStorage.getItem('sg-exams') || '[]');
