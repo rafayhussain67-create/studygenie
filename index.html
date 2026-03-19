@@ -152,10 +152,12 @@
   .plan-features-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
   .plan-features-list li { font-size: 14px; color: var(--text-muted); display: flex; align-items: flex-start; gap: 8px; }
   .plan-features-list li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
-  .plan-btn { display: block; width: 100%; background: var(--green); color: white; border: none; border-radius: 10px; padding: 13px; font-family: var(--font-head); font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; transition: background 0.15s; }
-  .plan-btn:hover { background: var(--green-dark); }
-  .plan-btn.outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
-  .plan-btn.outline:hover { border-color: var(--green); color: var(--green); }
+  .plan-btn { display: block; width: 100%; background: var(--green); color: white; border: 1.5px solid var(--green); border-radius: 10px; padding: 13px; font-family: var(--font-head); font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; transition: all 0.15s; box-sizing: border-box; }
+  .plan-btn:hover { background: var(--green-dark); border-color: var(--green-dark); }
+  .plan-btn.outline { background: transparent; border: 1.5px solid #6b7280; color: #374151; }
+  .plan-btn.outline:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+  body.dark .plan-btn.outline { border-color: #9ca3af; color: #e2e8f0; }
+  body.dark .plan-btn.outline:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
   .free-plan { max-width: 960px; margin: 20px auto 0; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
   .free-plan strong { font-family: var(--font-head); font-size: 16px; }
   .free-plan p { font-size: 14px; color: var(--text-muted); }
