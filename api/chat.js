@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { question, subject, level, image } = req.body;
+  const { question, subject, level, image, board } = req.body;
   if (!question && !image) return res.status(400).json({ error: 'No question provided' });
 
   const apiKey = process.env.GROQ_API_KEY;
