@@ -84,6 +84,24 @@
   .step-block { background: var(--green-light); border-left: 3px solid var(--green); border-radius: 0 8px 8px 0; padding: 9px 12px; margin: 7px 0; font-size: 13.5px; line-height: 1.6; }
   .step-label { font-weight: 700; color: var(--green-dark); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
   .formula-box { background: #f3f0ff; border: 1px solid #c4b5fd; border-radius: 8px; padding: 9px 14px; font-family: 'Courier New', monospace; font-size: 14px; color: #5b21b6; margin: 7px 0; text-align: center; }
+
+  .msg-wrap { display: flex; flex-direction: column; gap: 4px; max-width: 740px; width: 100%; margin: 0 auto; }
+  .msg-wrap.user { align-items: flex-end; }
+  .msg-actions { display: flex; gap: 6px; align-items: center; padding: 0 42px; }
+  .msg-wrap.user .msg-actions { justify-content: flex-end; padding: 0; }
+  .action-btn { background: none; border: none; cursor: pointer; font-size: 11px; color: var(--text-muted); padding: 3px 8px; border-radius: 6px; font-family: var(--font-body); transition: all 0.12s; display: flex; align-items: center; gap: 4px; }
+  .action-btn:hover { background: var(--bg); color: var(--text); }
+  .action-btn.paid { opacity: 0.5; }
+  .action-btn.paid:hover { background: var(--yellow-light); color: #92700a; }
+  .dots-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 3px 6px; border-radius: 6px; font-size: 16px; transition: all 0.12s; }
+  .dots-btn:hover { background: var(--bg); color: var(--text); }
+  .dots-menu { position: absolute; background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 5px; min-width: 200px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); z-index: 100; display: none; }
+  .dots-menu.open { display: block; }
+  .dots-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; border: none; background: transparent; cursor: pointer; font-family: var(--font-body); font-size: 13px; color: var(--text); transition: background 0.12s; text-align: left; width: 100%; }
+  .dots-menu-item:hover { background: var(--green-light); color: var(--green-dark); }
+  .dots-menu-item.locked { color: var(--text-muted); }
+  .dots-menu-item.locked:hover { background: var(--yellow-light); color: #92700a; }
+  .lock-icon { font-size: 11px; margin-left: auto; background: var(--yellow-light); color: #92700a; padding: 2px 6px; border-radius: 6px; font-weight: 600; }
   .dots { display: flex; gap: 5px; align-items: center; }
   .dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: bop 1.2s infinite; display: inline-block; }
   .dots span:nth-child(2) { animation-delay: 0.2s; }
@@ -108,6 +126,72 @@
   .plus-menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: none; background: transparent; cursor: pointer; font-family: var(--font-body); font-size: 14px; color: var(--text); transition: background 0.12s; text-align: left; width: 100%; }
   .plus-menu-item:hover { background: var(--green-light); color: var(--green-dark); }
   .plus-menu-item span { font-size: 18px; }
+
+  /* QUIZ MODE */
+  .quiz-page { display: none; flex: 1; flex-direction: column; overflow: hidden; background: var(--bg); }
+  .quiz-page.active { display: flex; }
+  .quiz-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .quiz-header h2 { font-family: var(--font-head); font-size: 17px; font-weight: 700; }
+  .quiz-progress { display: flex; align-items: center; gap: 12px; }
+  .quiz-progress-bar { width: 120px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .quiz-progress-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
+  .quiz-progress-text { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .quiz-body { flex: 1; overflow-y: auto; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .quiz-setup { max-width: 480px; width: 100%; background: var(--white); border-radius: 20px; padding: 28px; border: 1px solid var(--border); }
+  .quiz-setup h3 { font-family: var(--font-head); font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .quiz-setup p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+  .quiz-plans { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .quiz-plan { border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.15s; }
+  .quiz-plan:hover { border-color: var(--green); background: var(--green-light); }
+  .quiz-plan.selected { border-color: var(--green); background: var(--green-light); }
+  .quiz-plan-name { font-weight: 600; font-size: 14px; }
+  .quiz-plan-desc { font-size: 12px; color: var(--text-muted); }
+  .quiz-plan-badge { font-size: 11px; background: var(--green); color: white; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .quiz-plan-badge.locked { background: var(--border); color: var(--text-muted); }
+  .quiz-start-btn { width: 100%; background: var(--green); color: white; border: none; border-radius: 12px; padding: 14px; font-family: var(--font-head); font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+  .quiz-start-btn:hover { background: var(--green-dark); }
+  .quiz-q-card { max-width: 600px; width: 100%; background: var(--white); border-radius: 20px; padding: 28px; border: 1px solid var(--border); }
+  .quiz-q-num { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--green); margin-bottom: 8px; }
+  .quiz-q-text { font-family: var(--font-head); font-size: 17px; font-weight: 700; line-height: 1.4; margin-bottom: 20px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+  .quiz-option { border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.15s; background: var(--white); color: var(--text); text-align: left; font-family: var(--font-body); }
+  .quiz-option:hover { border-color: var(--green); background: var(--green-light); }
+  .quiz-option.correct { border-color: #1a9e6e; background: #e6f7f1; color: #0d6b4a; }
+  .quiz-option.wrong { border-color: #e24b4a; background: #fcebeb; color: #a32d2d; }
+  .quiz-option:disabled { cursor: default; }
+  .quiz-next-btn { width: 100%; background: var(--green); color: white; border: none; border-radius: 12px; padding: 13px; font-family: var(--font-head); font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 16px; display: none; }
+  .quiz-result { max-width: 480px; width: 100%; background: var(--white); border-radius: 20px; padding: 32px; border: 1px solid var(--border); text-align: center; }
+  .quiz-score-circle { width: 100px; height: 100px; border-radius: 50%; background: var(--green-light); border: 4px solid var(--green); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 20px; }
+  .quiz-score-num { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: var(--green); }
+  .quiz-score-label { font-size: 11px; color: var(--green); font-weight: 600; }
+  .quiz-result h3 { font-family: var(--font-head); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+  .quiz-result p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+  .quiz-result-btns { display: flex; gap: 10px; justify-content: center; }
+  .quiz-btn { background: var(--green); color: white; border: none; border-radius: 10px; padding: 11px 22px; font-family: var(--font-head); font-size: 14px; font-weight: 700; cursor: pointer; }
+  .quiz-btn.outline { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+
+  /* EXAM COUNTDOWN */
+  .exam-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: 8px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
+  .exam-chips-row { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+  .exam-chip { background: var(--green-light); border: 1px solid rgba(26,158,110,0.3); border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--green-dark); display: flex; align-items: center; gap: 6px; }
+  .exam-chip .days { font-family: var(--font-head); font-size: 15px; color: var(--green); }
+  .exam-chip .urgent { color: #e24b4a; }
+  .exam-chip-remove { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 14px; padding: 0 0 0 4px; line-height: 1; }
+  .add-exam-btn { background: none; border: 1.5px dashed var(--border); border-radius: 20px; padding: 5px 12px; font-size: 12px; color: var(--text-muted); cursor: pointer; font-family: var(--font-body); transition: all 0.15s; white-space: nowrap; }
+  .add-exam-btn:hover { border-color: var(--green); color: var(--green); }
+  .exam-modal-wrap { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: center; justify-content: center; }
+  .exam-modal-wrap.open { display: flex; }
+  .exam-modal { background: var(--white); border-radius: 20px; padding: 28px; max-width: 380px; width: 90%; }
+  .exam-modal h3 { font-family: var(--font-head); font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .exam-modal p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .exam-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .exam-field label { font-size: 13px; font-weight: 600; color: var(--text); }
+  .exam-field input { border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-family: var(--font-body); font-size: 14px; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s; }
+  .exam-field input:focus { border-color: var(--green); }
+  .exam-modal-btns { display: flex; gap: 8px; margin-top: 6px; }
+  .exam-save-btn { flex: 1; background: var(--green); color: white; border: none; border-radius: 10px; padding: 12px; font-family: var(--font-head); font-size: 14px; font-weight: 700; cursor: pointer; }
+  .exam-save-btn:hover { background: var(--green-dark); }
+  .exam-cancel-btn { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; font-family: var(--font-body); font-size: 14px; cursor: pointer; }
 
   /* FLASHCARDS */
   .fc-page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
@@ -216,6 +300,7 @@
   <div class="nav-right">
     <div class="credits-badge">⚡ <span id="cr">5</span> free left</div>
     <button class="btn-upgrade" onclick="openModal()">Upgrade — from PKR 500</button>
+    <button class="btn-home" onclick="openQuiz()" style="border-color:var(--green);color:var(--green)">🧠 Quiz</button>
     <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙</button>
     <a href="index.html" class="btn-home">← Home</a>
   </div>
@@ -243,6 +328,12 @@
   </aside>
 
   <main class="main">
+    <!-- EXAM COUNTDOWN BAR -->
+    <div class="exam-bar" id="exam-bar">
+      <div class="exam-chips-row" id="exam-chips-row"></div>
+      <button class="add-exam-btn" onclick="openExamModal()">+ Add exam date</button>
+    </div>
+
     <div class="hero" id="hero">
       <div class="hero-icon">🎓</div>
       <h1>Your AI study assistant<br>for Pakistani students</h1>
@@ -325,6 +416,63 @@
         <div class="cards">100</div>
         <div class="desc">cards · Unlimited</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ PAGE -->
+<div class="quiz-page" id="quiz-page">
+  <div class="quiz-header">
+    <h2>🧠 Quiz Mode</h2>
+    <div class="quiz-progress">
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-progress-fill" style="width:0%"></div></div>
+      <span class="quiz-progress-text" id="quiz-progress-text">0 / 0</span>
+      <button class="fc-back" onclick="closeQuiz()">← Back</button>
+    </div>
+  </div>
+  <div class="quiz-body" id="quiz-body">
+    <div class="quiz-setup">
+      <h3>🧠 Test your knowledge</h3>
+      <p>Choose a quiz mode and we'll generate questions based on your subject and level</p>
+      <div class="quiz-plans">
+        <div class="quiz-plan selected" id="qp-free" onclick="selectQuizPlan('free')">
+          <div><div class="quiz-plan-name">Quick Quiz</div><div class="quiz-plan-desc">3 MCQ questions · Score shown</div></div>
+          <span class="quiz-plan-badge">FREE</span>
+        </div>
+        <div class="quiz-plan" id="qp-starter" onclick="selectQuizPlan('starter')">
+          <div><div class="quiz-plan-name">Standard Quiz</div><div class="quiz-plan-desc">10 questions · MCQ + True/False</div></div>
+          <span class="quiz-plan-badge locked">PKR 500</span>
+        </div>
+        <div class="quiz-plan" id="qp-scholar" onclick="selectQuizPlan('scholar')">
+          <div><div class="quiz-plan-name">Deep Dive</div><div class="quiz-plan-desc">20 questions · All types + history</div></div>
+          <span class="quiz-plan-badge locked">PKR 750</span>
+        </div>
+        <div class="quiz-plan" id="qp-pro" onclick="selectQuizPlan('pro')">
+          <div><div class="quiz-plan-name">Pro Analysis</div><div class="quiz-plan-desc">Unlimited · Weak topic detection</div></div>
+          <span class="quiz-plan-badge locked">PKR 999</span>
+        </div>
+      </div>
+      <button class="quiz-start-btn" onclick="startQuiz()">Start Quiz →</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM MODAL -->
+<div class="exam-modal-wrap" id="exam-modal-wrap" onclick="closeExamModalOutside(event)">
+  <div class="exam-modal">
+    <h3>📅 Add Exam Date</h3>
+    <p>We'll count down to your exam every time you open StudyGenie</p>
+    <div class="exam-field">
+      <label>Exam name (e.g. Physics Paper 1)</label>
+      <input type="text" id="exam-name-input" placeholder="e.g. Matric Mathematics">
+    </div>
+    <div class="exam-field">
+      <label>Exam date</label>
+      <input type="date" id="exam-date-input">
+    </div>
+    <div class="exam-modal-btns">
+      <button class="exam-cancel-btn" onclick="closeExamModal()">Cancel</button>
+      <button class="exam-save-btn" onclick="saveExam()">Save Exam →</button>
     </div>
   </div>
 </div>
@@ -479,13 +627,59 @@
   function resize(el) { el.style.height='50px'; el.style.height=Math.min(el.scrollHeight,130)+'px'; }
   function onKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask();} }
 
+  let msgCounter = 0;
+
   function addMsg(role, html) {
     const chat = document.getElementById('chat');
-    const d = document.createElement('div'); d.className = `msg ${role}`;
-    const av = document.createElement('div'); av.className = `m-av ${role==='ai'?'ai':'u'}`; av.textContent = role==='ai'?'✦':'U';
-    const b = document.createElement('div'); b.className = `bubble ${role==='ai'?'ai':'user'}`;
-    if(role==='ai') b.innerHTML=html; else b.textContent=html;
-    d.appendChild(av); d.appendChild(b); chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
+    const msgId = 'msg-' + (msgCounter++);
+
+    if(role === 'ai') {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-wrap';
+
+      const msgRow = document.createElement('div');
+      msgRow.className = 'msg ai';
+
+      const av = document.createElement('div');
+      av.className = 'm-av ai'; av.textContent = '✦';
+
+      const b = document.createElement('div');
+      b.className = 'bubble ai';
+      b.id = msgId;
+      b.innerHTML = html;
+
+      msgRow.appendChild(av);
+      msgRow.appendChild(b);
+      wrap.appendChild(msgRow);
+
+      const actions = document.createElement('div');
+      actions.className = 'msg-actions';
+      actions.style.position = 'relative';
+      actions.innerHTML = `
+        <button class="dots-btn" onclick="toggleDotsMenu('dm-${msgId}', event)">•••</button>
+        <div class="dots-menu" id="dm-${msgId}">
+          <button class="dots-menu-item" onclick="translateUrdu('${msgId}','dm-${msgId}')">🇵🇰 Translate to Urdu</button>
+          <button class="dots-menu-item" onclick="explainSimpler('${msgId}','dm-${msgId}')">💡 Explain simpler</button>
+          <button class="dots-menu-item locked" onclick="explainDetailed('${msgId}','dm-${msgId}')">📖 Explain in more detail <span class="lock-icon">PRO</span></button>
+        </div>`;
+
+      wrap.appendChild(actions);
+      chat.appendChild(wrap);
+    } else {
+      const d = document.createElement('div');
+      d.className = 'msg-wrap user';
+      const msgRow = document.createElement('div');
+      msgRow.className = 'msg user';
+      const av = document.createElement('div');
+      av.className = 'm-av u'; av.textContent = 'U';
+      const b = document.createElement('div');
+      b.className = 'bubble user'; b.textContent = html;
+      msgRow.appendChild(av); msgRow.appendChild(b);
+      d.appendChild(msgRow);
+      chat.appendChild(d);
+    }
+
+    chat.scrollTop = chat.scrollHeight;
   }
 
   function addLoader() {
@@ -564,6 +758,223 @@
     if(credits===0) {
       setTimeout(()=>{ addMsg('ai','<h3>You\'ve used all 5 free questions!</h3><p>Upgrade to keep studying. Plans start from just <strong>PKR 500/month</strong> — click Upgrade above!</p>'); },800);
     }
+  }
+
+  // QUIZ MODE
+  let selectedQuizPlan = 'free';
+  let quizQuestions = [];
+  let quizCurrent = 0;
+  let quizScore = 0;
+  let quizAnswered = false;
+
+  function openQuiz() {
+    document.querySelector('.layout').style.display = 'none';
+    document.getElementById('fc-page').classList.remove('active');
+    document.getElementById('quiz-page').classList.add('active');
+    resetQuizSetup();
+  }
+
+  function closeQuiz() {
+    document.getElementById('quiz-page').classList.remove('active');
+    document.querySelector('.layout').style.display = 'flex';
+  }
+
+  function selectQuizPlan(plan) {
+    selectedQuizPlan = plan;
+    document.querySelectorAll('.quiz-plan').forEach(p => p.classList.remove('selected'));
+    document.getElementById('qp-' + plan).classList.add('selected');
+    if(plan !== 'free') { setTimeout(() => { openModal(); resetQuizSetup(); }, 100); }
+  }
+
+  function resetQuizSetup() {
+    selectedQuizPlan = 'free';
+    document.querySelectorAll('.quiz-plan').forEach(p => p.classList.remove('selected'));
+    document.getElementById('qp-free').classList.add('selected');
+  }
+
+  async function startQuiz() {
+    const qBody = document.getElementById('quiz-body');
+    qBody.innerHTML = '<div class="fc-generating"><div class="dots"><span></span><span></span><span></span></div><p style="margin-top:12px;color:var(--text-muted);font-size:14px">Generating your quiz questions...</p></div>';
+
+    try {
+      const res = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject: sub || 'General', level: lvl || 'Matric', count: 3 })
+      });
+      const data = await res.json();
+      if(data.questions) {
+        quizQuestions = data.questions;
+        quizCurrent = 0;
+        quizScore = 0;
+        showQuizQuestion();
+      } else {
+        qBody.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Could not generate quiz. Please try again.</p>';
+      }
+    } catch(e) {
+      qBody.innerHTML = '<p style="color:#e24b4a;text-align:center;padding:20px">Error generating quiz. Please try again.</p>';
+    }
+  }
+
+  function showQuizQuestion() {
+    const q = quizQuestions[quizCurrent];
+    const total = quizQuestions.length;
+    document.getElementById('quiz-progress-fill').style.width = ((quizCurrent / total) * 100) + '%';
+    document.getElementById('quiz-progress-text').textContent = (quizCurrent + 1) + ' / ' + total;
+    quizAnswered = false;
+
+    const qBody = document.getElementById('quiz-body');
+    qBody.innerHTML = `
+      <div class="quiz-q-card">
+        <div class="quiz-q-num">Question ${quizCurrent + 1} of ${total}</div>
+        <div class="quiz-q-text">${q.question}</div>
+        <div class="quiz-options" id="quiz-options">
+          ${q.options.map((opt, i) => `<button class="quiz-option" onclick="answerQuiz(${i})" id="qopt-${i}">${opt}</button>`).join('')}
+        </div>
+        <button class="quiz-next-btn" id="quiz-next" onclick="nextQuestion()">${quizCurrent === total - 1 ? 'See Results →' : 'Next Question →'}</button>
+      </div>`;
+  }
+
+  function answerQuiz(idx) {
+    if(quizAnswered) return;
+    quizAnswered = true;
+    const q = quizQuestions[quizCurrent];
+    const correct = q.correct;
+    document.querySelectorAll('.quiz-option').forEach((btn, i) => {
+      btn.disabled = true;
+      if(i === correct) btn.classList.add('correct');
+      else if(i === idx && idx !== correct) btn.classList.add('wrong');
+    });
+    if(idx === correct) quizScore++;
+    document.getElementById('quiz-next').style.display = 'block';
+  }
+
+  function nextQuestion() {
+    quizCurrent++;
+    if(quizCurrent >= quizQuestions.length) showQuizResult();
+    else showQuizQuestion();
+  }
+
+  function showQuizResult() {
+    const total = quizQuestions.length;
+    const pct = Math.round((quizScore / total) * 100);
+    document.getElementById('quiz-progress-fill').style.width = '100%';
+    document.getElementById('quiz-progress-text').textContent = total + ' / ' + total;
+    let msg = pct === 100 ? 'Perfect score! Amazing!' : pct >= 70 ? 'Great job! Keep it up!' : pct >= 40 ? 'Good effort! Review the topics again.' : 'Keep studying! You\'ll get there.';
+    document.getElementById('quiz-body').innerHTML = `
+      <div class="quiz-result">
+        <div class="quiz-score-circle">
+          <div class="quiz-score-num">${pct}%</div>
+          <div class="quiz-score-label">SCORE</div>
+        </div>
+        <h3>${msg}</h3>
+        <p>You got ${quizScore} out of ${total} questions correct</p>
+        <div class="quiz-result-btns">
+          <button class="quiz-btn outline" onclick="closeQuiz()">Back to Chat</button>
+          <button class="quiz-btn" onclick="startQuiz()">Try Again →</button>
+        </div>
+      </div>`;
+  }
+
+  // EXAM COUNTDOWN
+  let exams = JSON.parse(localStorage.getItem('sg-exams') || '[]');
+
+  function renderExamBar() {
+    const row = document.getElementById('exam-chips-row');
+    row.innerHTML = '';
+    const now = new Date();
+    exams = exams.filter(e => new Date(e.date) >= now);
+    localStorage.setItem('sg-exams', JSON.stringify(exams));
+    exams.forEach((exam, i) => {
+      const examDate = new Date(exam.date);
+      const diff = examDate - now;
+      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      const urgent = days <= 3;
+      const chip = document.createElement('div');
+      chip.className = 'exam-chip';
+      chip.innerHTML = `<span class="${urgent ? 'days urgent' : 'days'}">${days}d</span> ${exam.name} <button class="exam-chip-remove" onclick="removeExam(${i})">✕</button>`;
+      row.appendChild(chip);
+    });
+  }
+
+  function openExamModal() {
+    document.getElementById('exam-modal-wrap').classList.add('open');
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    document.getElementById('exam-date-input').min = today.toISOString().split('T')[0];
+  }
+
+  function closeExamModal() { document.getElementById('exam-modal-wrap').classList.remove('open'); }
+  function closeExamModalOutside(e) { if(e.target === document.getElementById('exam-modal-wrap')) closeExamModal(); }
+
+  function saveExam() {
+    const name = document.getElementById('exam-name-input').value.trim();
+    const date = document.getElementById('exam-date-input').value;
+    if(!name || !date) { alert('Please fill in both fields'); return; }
+    exams.push({ name, date });
+    localStorage.setItem('sg-exams', JSON.stringify(exams));
+    renderExamBar();
+    closeExamModal();
+    document.getElementById('exam-name-input').value = '';
+    document.getElementById('exam-date-input').value = '';
+  }
+
+  function removeExam(i) {
+    exams.splice(i, 1);
+    localStorage.setItem('sg-exams', JSON.stringify(exams));
+    renderExamBar();
+  }
+
+  renderExamBar();
+  setInterval(renderExamBar, 60000);
+
+  function toggleDotsMenu(menuId, e) {
+    e.stopPropagation();
+    document.querySelectorAll('.dots-menu').forEach(m => {
+      if(m.id !== menuId) m.classList.remove('open');
+    });
+    document.getElementById(menuId).classList.toggle('open');
+  }
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.dots-menu').forEach(m => m.classList.remove('open'));
+  });
+
+  async function translateUrdu(msgId, menuId) {
+    document.getElementById(menuId).classList.remove('open');
+    const bubble = document.getElementById(msgId);
+    const original = bubble.innerHTML;
+    bubble.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: 'Translate this to Urdu, keeping the same HTML format with step-block and formula-box divs: ' + original.replace(/<[^>]*>/g,'').substring(0,500), subject: sub, level: lvl })
+      });
+      const data = await res.json();
+      bubble.innerHTML = data.answer || original;
+    } catch(e) { bubble.innerHTML = original; }
+  }
+
+  async function explainSimpler(msgId, menuId) {
+    document.getElementById(menuId).classList.remove('open');
+    const bubble = document.getElementById(msgId);
+    const original = bubble.innerHTML;
+    const text = original.replace(/<[^>]*>/g,'').substring(0,500);
+    bubble.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: 'Explain this in much simpler language for a younger student, use very simple words and short sentences, keep HTML formatting: ' + text, subject: sub, level: lvl })
+      });
+      const data = await res.json();
+      bubble.innerHTML = data.answer || original;
+    } catch(e) { bubble.innerHTML = original; }
+  }
+
+  async function explainDetailed(msgId, menuId) {
+    document.getElementById(menuId).classList.remove('open');
+    openModal();
   }
 
   function togglePlusMenu(e) {
