@@ -6,13 +6,13 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { question, subject, level } = req.body;
-  if (!question) return res.status(400).json({ error: 'No question provided' });
+  const { question, subject, level, image } = req.body;
+  if (!question && !image) return res.status(400).json({ error: 'No question provided' });
 
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
-  const prompt = `You are StudyGenie, an AI tutor for Pakistani ${level} students studying ${subject}. Give clear step-by-step answers aligned with the Pakistani curriculum (Federal Board, Punjab Board, Sindh Board, Cambridge O/A Levels). Use simple English.
+  const systemPrompt = `You are StudyGenie, an AI tutor for Pakistani ${level} students studying ${subject}. Give clear step-by-step answers aligned with the Pakistani curriculum (Federal Board, Punjab Board, Sindh Board, Cambridge O/A Levels). Use simple English.
 
 Format your response as HTML:
 - Use <h3> for the main answer heading
@@ -20,21 +20,35 @@ Format your response as HTML:
 - Use <div class="formula-box">formula here</div> for math formulas
 - End with a short encouraging <p> tag
 
-Be concise, accurate, and friendly. Question: ${question}`;
+Be concise, accurate, and friendly.`;
 
   try {
+    let messages;
+
+    if (image) {
+      messages = [{
+        role: 'user',
+        content: [
+          { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${image}` } },
+          { type: 'text', text: `${systemPrompt}\n\nSolve the question shown in this image. ${question ? 'Additional context: ' + question : ''}` }
+        ]
+      }];
+    } else {
+      messages = [{
+        role: 'user',
+        content: `${systemPrompt}\n\nQuestion: ${question}`
+      }];
+    }
+
+    const model = image ? 'llama-3.2-11b-vision-preview' : 'llama-3.3-70b-versatile';
+
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 1000,
-        temperature: 0.7
-      })
+      body: JSON.stringify({ model, messages, max_tokens: 1000, temperature: 0.7 })
     });
 
     const data = await response.json();
@@ -53,4 +67,3 @@ Be concise, accurate, and friendly. Question: ${question}`;
     return res.status(500).json({ error: err.message });
   }
 }
-
