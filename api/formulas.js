@@ -9,6 +9,24 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: 'No API key' });
 
   try {
+    // Step 1: Validate topic matches subject
+    const validateRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: `Does the topic "${topic}" belong to the subject "${subject}" in Pakistani school/college curriculum? Reply with ONLY "yes" or "no".` }],
+        max_tokens: 5, temperature: 0
+      })
+    });
+    const validateData = await validateRes.json();
+    const answer = validateData.choices?.[0]?.message?.content?.trim().toLowerCase();
+
+    if(answer === 'no') {
+      return res.status(400).json({ mismatch: true, error: `"${topic}" does not belong to ${subject}. Please check your subject and topic.` });
+    }
+
+    // Step 2: Generate formula sheet
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
@@ -18,11 +36,13 @@ export default async function handler(req, res) {
         max_tokens: 2000, temperature: 0.3
       })
     });
+
     const data = await response.json();
     let text = data.choices?.[0]?.message?.content || '[]';
     text = text.replace(/```json|```/g, '').trim();
     const formulas = JSON.parse(text);
     return res.status(200).json({ formulas });
+
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
