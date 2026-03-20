@@ -907,7 +907,8 @@
         <button class="ans-btn" id="like-${msgId}" onclick="rateAnswer('${msgId}','like')">👍 <span id="like-count-${msgId}">0</span></button>
         <button class="ans-btn" id="dislike-${msgId}" onclick="rateAnswer('${msgId}','dislike')">👎</button>
         <button class="ans-btn" onclick="regenerateAnswer('${msgId}')">🔄 Regenerate</button>
-        <button class="ans-btn" onclick="copyAnswer('${msgId}')">📋 Copy</button>`;
+        <button class="ans-btn" onclick="copyAnswer('${msgId}')">📋 Copy</button>
+        <button class="ans-btn" onclick="saveAsNote('${msgId}')" style="color:#f59e0b;border-color:#f59e0b">📝 Save note</button>`;
       b.appendChild(actionBar);
 
       const actions = document.createElement('div');
@@ -1577,6 +1578,8 @@
     const bubble = document.getElementById(msgId);
     if(!bubble) return;
     const lastQ = chatHistory[chatHistory.length-1] || 'Explain again';
+    // Save the action bar before wiping
+    const savedActionBar = bubble.querySelector('.answer-actions');
     bubble.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
     try {
       const res = await fetch('/api/chat', {
@@ -1585,7 +1588,19 @@
         body: JSON.stringify({ question: lastQ + ' (please explain differently)', subject: sub, level: lvl })
       });
       const data = await res.json();
-      bubble.innerHTML = data.answer || 'Sorry, could not regenerate.';
+      const newAnswer = data.answer || 'Sorry, could not regenerate.';
+      bubble.innerHTML = newAnswer;
+      // Re-add action bar
+      const newBar = document.createElement('div');
+      newBar.className = 'answer-actions';
+      newBar.innerHTML = `
+        <button class="ans-btn" id="like-${msgId}" onclick="rateAnswer('${msgId}','like')">👍 <span id="like-count-${msgId}">0</span></button>
+        <button class="ans-btn" id="dislike-${msgId}" onclick="rateAnswer('${msgId}','dislike')">👎</button>
+        <button class="ans-btn" onclick="regenerateAnswer('${msgId}')">🔄 Regenerate</button>
+        <button class="ans-btn" onclick="copyAnswer('${msgId}')">📋 Copy</button>
+        <button class="ans-btn" onclick="saveAsNote('${msgId}')" style="color:#f59e0b;border-color:#f59e0b">📝 Save note</button>`;
+      bubble.appendChild(newBar);
+      trackMsg(msgId, lastQ, newAnswer);
     } catch(e) { bubble.innerHTML = 'Error regenerating. Please try again.'; }
   }
 
