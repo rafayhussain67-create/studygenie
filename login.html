@@ -169,12 +169,12 @@
 <script src="supabase.js"></script>
 <script>
   // Check if already logged in → redirect to app
-  supabase.auth.getSession().then(({ data: { session } }) => {
+  _supa.auth.getSession().then(({ data: { session } }) => {
     if (session) window.location.href = 'app.html';
   });
 
   // Listen for OAuth redirect
-  supabase.auth.onAuthStateChange((event, session) => {
+  _supa.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN' && session) {
       window.location.href = 'app.html';
     }
@@ -220,7 +220,7 @@
     if (!email || !password) { showError('Please enter your email and password.'); return; }
     setLoading('login-btn', true);
     hideMessages();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await _supa.auth.signInWithPassword({ email, password });
     setLoading('login-btn', false);
     if (error) { showError(error.message); return; }
     window.location.href = 'app.html';
@@ -234,7 +234,7 @@
     if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
     setLoading('signup-btn', true);
     hideMessages();
-    const { error } = await supabase.auth.signUp({
+    const { error } = await _supa.auth.signUp({
       email, password,
       options: { data: { full_name: name } }
     });
@@ -244,7 +244,7 @@
   }
 
   async function handleGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await _supa.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin + '/app.html' }
     });
