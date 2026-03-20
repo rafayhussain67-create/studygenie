@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyGenie — Payments Coming Soon</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --green: #1a9e6e; --green-light: #e6f7f1; --green-dark: #0d6b4a; --text: #0f1117; --text-muted: #6b7280; --border: #e5e7eb; --bg: #f9fafb; --white: #ffffff; --font-head: 'Sora', sans-serif; --font-body: 'DM Sans', sans-serif; }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+  .icon { font-size: 64px; margin-bottom: 20px; }
+  h1 { font-family: var(--font-head); font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+  p { font-size: 16px; color: var(--text-muted); max-width: 440px; line-height: 1.7; margin-bottom: 8px; }
+  .plans { display: flex; gap: 12px; margin: 28px 0; flex-wrap: wrap; justify-content: center; }
+  .plan-tag { background: var(--green-light); color: var(--green-dark); border: 1px solid rgba(26,158,110,0.3); border-radius: 20px; padding: 8px 20px; font-size: 14px; font-weight: 600; }
+  .btn { display: inline-block; background: var(--green); color: white; border: none; border-radius: 12px; padding: 14px 32px; font-family: var(--font-head); font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none; transition: background 0.15s; margin-top: 8px; }
+  .btn:hover { background: var(--green-dark); }
+  .btn-outline { display: inline-block; background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); border-radius: 12px; padding: 13px 28px; font-family: var(--font-body); font-size: 15px; cursor: pointer; text-decoration: none; transition: all 0.15s; margin-top: 8px; margin-left: 10px; }
+  .btn-outline:hover { border-color: var(--green); color: var(--green); }
+  .free-note { background: var(--green-light); border: 1px solid rgba(26,158,110,0.3); border-radius: 14px; padding: 16px 24px; margin-top: 24px; max-width: 400px; }
+  .free-note strong { color: var(--green-dark); font-family: var(--font-head); }
+</style>
+</head>
+<body>
+  <div class="icon">🚀</div>
+  <h1>Payments coming soon!</h1>
+  <p>We're setting up JazzCash, EasyPaisa, Visa and Mastercard payments in PKR.</p>
+  <p>We'll notify you as soon as it's ready!</p>
+  <div class="plans">
+    <span class="plan-tag">Starter — PKR 500/mo</span>
+    <span class="plan-tag">Scholar — PKR 750/mo</span>
+    <span class="plan-tag">Pro — PKR 999/mo</span>
+  </div>
+  <div>
+    <a href="app.html" class="btn">Use free plan for now →</a>
+    <a href="index.html" class="btn-outline">← Back</a>
+  </div>
+  <div class="free-note">
+    <strong>Free plan is always available</strong><br>
+    <span style="font-size:13px;color:var(--text-muted)">5 questions/day · All subjects · No credit card needed</span>
+  </div>
+</body>
+</html>
