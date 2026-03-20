@@ -369,6 +369,7 @@
     <button class="btn-home" onclick="openFormulas()" style="border-color:#7c3aed;color:#7c3aed">📐 Formulas</button>
     <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙</button>
     <a href="index.html" class="btn-home">← Home</a>
+    <a href="history.html" class="btn-home" style="color:#6366f1;border-color:#6366f1">📋 History</a>
     <button class="btn-home" onclick="signOut()" style="color:#e24b4a;border-color:#e24b4a">Sign Out</button>
   </div>
 </nav>
@@ -632,7 +633,7 @@
 
   // ── AUTH GUARD ──────────────────────────────
   async function initAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await _supa.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
     currentUser = session.user;
     currentProfile = await getProfile();
@@ -680,10 +681,18 @@
   // Save level to Supabase when user picks it
   async function saveLevelToDB(level) {
     if (!currentUser) return;
-    await supabase.from('profiles').update({ level }).eq('id', currentUser.id);
+    await _supa.from('profiles').update({ level }).eq('id', currentUser.id);
   }
 
-  initAuth();
+  initAuth().then(() => {
+    // Handle "ask again" from history page
+    const askAgain = sessionStorage.getItem('sg-ask-again');
+    if (askAgain) {
+      sessionStorage.removeItem('sg-ask-again');
+      document.getElementById('q').value = askAgain;
+      document.getElementById('q').focus();
+    }
+  });
   let currentImageBase64 = null;
   let chatHistory = [];
 
@@ -985,7 +994,7 @@
 
     busy=false;
     document.getElementById('send').disabled=false;
-    updateStreak();
+    updateStreakUI();
     generateRelated(q);
 
     if(credits===0) {
@@ -1555,20 +1564,15 @@
   // ============================================
   // STUDY STREAK
   // ============================================
-  async function updateStreak() {
-    const s = await updateStreak(); // from supabase.js
+  async function updateStreakUI() {
+    const s = await updateStreak(); // updateStreak() is from supabase.js
     if (s) {
       const el = document.getElementById('streak-count');
       if (el) el.textContent = s.current_streak + ' day' + (s.current_streak !== 1 ? 's' : '');
     }
   }
 
-  function loadStreak() {
-    const data = JSON.parse(localStorage.getItem('sg-streak') || '{"streak":0,"longest":0,"last":""}');
-    const el = document.getElementById('streak-count');
-    if(el) el.textContent = data.streak + ' day' + (data.streak !== 1 ? 's' : '');
-  }
-  loadStreak();
+  // streak loaded from DB in initAuth()
 
   // ============================================
   // BOARD SELECTOR
