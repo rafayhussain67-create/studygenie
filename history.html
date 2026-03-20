@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyGenie — My History</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #1a9e6e; --green-light: #e6f7f1; --green-dark: #0d6b4a;
+    --text: #0f1117; --text-muted: #6b7280;
+    --border: #e5e7eb; --bg: #f9fafb; --white: #ffffff;
+    --font-head: 'Sora', sans-serif; --font-body: 'DM Sans', sans-serif;
+    --red: #e24b4a; --red-light: #fcebeb;
+  }
+  body.dark {
+    --text: #f1f5f9; --text-muted: #94a3b8;
+    --border: #2d3748; --bg: #0f1117; --white: #1a1f2e;
+    --green-light: #0d2d20;
+  }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  nav {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    height: 60px; display: flex; align-items: center;
+    padding: 0 5%; justify-content: space-between; position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-family: var(--font-head); font-size: 19px; font-weight: 800; color: var(--green); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+  .logo-mark { width: 32px; height: 32px; background: var(--green); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .btn-nav { background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px; padding: 7px 14px; font-family: var(--font-body); font-size: 13px; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+  .btn-nav:hover { border-color: var(--green); color: var(--green); }
+
+  .page { max-width: 800px; margin: 0 auto; padding: 32px 20px; }
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 { font-family: var(--font-head); font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+  .page-header p { color: var(--text-muted); font-size: 14px; }
+
+  .search-row { display: flex; gap: 10px; margin-bottom: 20px; }
+  .search-input {
+    flex: 1; border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 10px 14px; font-family: var(--font-body); font-size: 14px;
+    color: var(--text); background: var(--white); outline: none; transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--green); }
+  .filter-select {
+    border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px;
+    font-family: var(--font-body); font-size: 14px; color: var(--text);
+    background: var(--white); outline: none; cursor: pointer;
+  }
+
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 16px 20px; }
+  .stat-num { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: var(--green); }
+  .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .history-list { display: flex; flex-direction: column; gap: 12px; }
+  .history-item {
+    background: var(--white); border: 1px solid var(--border); border-radius: 16px;
+    overflow: hidden; transition: box-shadow 0.15s;
+  }
+  .history-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+  .history-header {
+    padding: 16px 20px; display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px; cursor: pointer;
+  }
+  .history-question { font-size: 14px; font-weight: 600; line-height: 1.5; flex: 1; }
+  .history-meta { display: flex; gap: 8px; align-items: center; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+  .badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 8px; background: var(--green-light); color: var(--green-dark); }
+  .badge.date { background: var(--bg); color: var(--text-muted); }
+  .history-body { display: none; padding: 0 20px 16px; border-top: 1px solid var(--border); }
+  .history-body.open { display: block; }
+  .history-answer { font-size: 13px; line-height: 1.7; color: var(--text-muted); padding-top: 14px; white-space: pre-wrap; }
+  .history-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .act-btn { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--text-muted); font-family: var(--font-body); transition: all 0.15s; }
+  .act-btn:hover { border-color: var(--green); color: var(--green); }
+  .act-btn.danger:hover { border-color: var(--red); color: var(--red); background: var(--red-light); }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty h3 { font-family: var(--font-head); font-size: 18px; margin-bottom: 6px; color: var(--text); }
+
+  .loading-spinner { text-align: center; padding: 40px; color: var(--text-muted); }
+  .dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: bop 1.2s infinite; display: inline-block; margin: 0 3px; }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bop { 0%,80%,100%{transform:translateY(0);opacity:0.4}40%{transform:translateY(-6px);opacity:1} }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: var(--white); padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 9999; transition: transform 0.3s; pointer-events: none; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .delete-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: center; justify-content: center; }
+  .delete-modal.open { display: flex; }
+  .delete-box { background: var(--white); border-radius: 16px; padding: 28px; max-width: 380px; width: 90%; text-align: center; }
+  .delete-box h3 { font-family: var(--font-head); font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+  .delete-box p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+  .delete-btns { display: flex; gap: 10px; justify-content: center; }
+  .btn-cancel { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 20px; font-family: var(--font-body); font-size: 14px; cursor: pointer; color: var(--text); }
+  .btn-delete { background: var(--red); border: none; border-radius: 10px; padding: 10px 20px; font-family: var(--font-head); font-size: 14px; font-weight: 700; cursor: pointer; color: white; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="app.html" class="logo"><div class="logo-mark">✦</div>StudyGenie</a>
+  <div class="nav-right">
+    <a href="app.html" class="btn-nav">← Back to Chat</a>
+    <button class="btn-nav" onclick="toggleDark()" id="dark-btn">🌙</button>
+    <button class="btn-nav" onclick="signOut()" style="color:#e24b4a;border-color:#e24b4a">Sign Out</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>📋 My History</h1>
+    <p>All your past questions and answers</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-total">—</div>
+      <div class="stat-label">Total questions asked</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-streak">—</div>
+      <div class="stat-label">Day streak 🔥</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-subjects">—</div>
+      <div class="stat-label">Subjects studied</div>
+    </div>
+  </div>
+
+  <div class="search-row">
+    <input type="text" class="search-input" id="search-input" placeholder="Search your questions..." oninput="filterHistory()">
+    <select class="filter-select" id="subject-filter" onchange="filterHistory()">
+      <option value="">All subjects</option>
+      <option>Mathematics</option>
+      <option>Physics</option>
+      <option>Chemistry</option>
+      <option>Biology</option>
+      <option>English</option>
+      <option>Urdu</option>
+      <option>Computer Science</option>
+      <option>Economics</option>
+      <option>Pakistan Studies</option>
+      <option>Islamiyat</option>
+    </select>
+  </div>
+
+  <div id="history-container">
+    <div class="loading-spinner">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <p style="margin-top:12px;font-size:14px">Loading your history...</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="delete-modal" id="delete-modal">
+  <div class="delete-box">
+    <h3>Delete this question?</h3>
+    <p>This will permanently remove the question and its answer from your history.</p>
+    <div class="delete-btns">
+      <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-delete" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script>
+  let allHistory = [];
+  let deleteTargetId = null;
+
+  // Dark mode
+  if (localStorage.getItem('studygenie-dark') === 'true') {
+    document.body.classList.add('dark');
+    document.getElementById('dark-btn').textContent = '☀️';
+  }
+  function toggleDark() {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    document.getElementById('dark-btn').textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('studygenie-dark', isDark);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  async function init() {
+    // Auth check
+    const { data: { session } } = await _supa.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+
+    loadHistory(session.user.id);
+    loadStats(session.user.id);
+  }
+
+  async function loadHistory(userId) {
+    const { data, error } = await _supa
+      .from('question_history')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      document.getElementById('history-container').innerHTML = '<p style="text-align:center;color:#e24b4a;padding:40px">Error loading history. Please refresh.</p>';
+      return;
+    }
+
+    allHistory = data || [];
+    renderHistory(allHistory);
+  }
+
+  async function loadStats(userId) {
+    // Total questions
+    const { count } = await _supa
+      .from('question_history')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId);
+
+    document.getElementById('stat-total').textContent = count || 0;
+
+    // Streak
+    const streak = await getStreak();
+    document.getElementById('stat-streak').textContent = streak.current_streak || 0;
+
+    // Unique subjects
+    const { data } = await _supa
+      .from('question_history')
+      .select('subject')
+      .eq('user_id', userId)
+      .not('subject', 'is', null);
+
+    const uniqueSubjects = new Set((data || []).map(r => r.subject).filter(Boolean));
+    document.getElementById('stat-subjects').textContent = uniqueSubjects.size || 0;
+  }
+
+  function renderHistory(items) {
+    const container = document.getElementById('history-container');
+
+    if (!items.length) {
+      container.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">📚</div>
+          <h3>No history yet</h3>
+          <p>Start asking questions in the chat and they'll appear here</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = `<div class="history-list">${items.map(item => `
+      <div class="history-item" id="item-${item.id}">
+        <div class="history-header" onclick="toggleItem('${item.id}')">
+          <div class="history-question">${escapeHtml(item.question)}</div>
+          <div class="history-meta">
+            ${item.subject ? `<span class="badge">${item.subject}</span>` : ''}
+            <span class="badge date">${formatDate(item.created_at)}</span>
+          </div>
+        </div>
+        <div class="history-body" id="body-${item.id}">
+          <div class="history-answer">${escapeHtml(stripHtml(item.answer))}</div>
+          <div class="history-actions">
+            <button class="act-btn" onclick="copyAnswer('${item.id}')">📋 Copy answer</button>
+            <button class="act-btn" onclick="askAgain('${escapeHtml(item.question).replace(/'/g, "\\'")}')">🔄 Ask again</button>
+            <button class="act-btn danger" onclick="openDeleteModal('${item.id}')">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  function filterHistory() {
+    const search = document.getElementById('search-input').value.toLowerCase();
+    const subject = document.getElementById('subject-filter').value;
+    const filtered = allHistory.filter(item => {
+      const matchSearch = !search || item.question.toLowerCase().includes(search) || (item.answer || '').toLowerCase().includes(search);
+      const matchSubject = !subject || item.subject === subject;
+      return matchSearch && matchSubject;
+    });
+    renderHistory(filtered);
+  }
+
+  function toggleItem(id) {
+    const body = document.getElementById('body-' + id);
+    body.classList.toggle('open');
+  }
+
+  function copyAnswer(id) {
+    const item = allHistory.find(h => h.id === id);
+    if (!item) return;
+    navigator.clipboard.writeText(stripHtml(item.answer)).then(() => showToast('✅ Answer copied!'));
+  }
+
+  function askAgain(question) {
+    sessionStorage.setItem('sg-ask-again', question);
+    window.location.href = 'app.html';
+  }
+
+  function openDeleteModal(id) {
+    deleteTargetId = id;
+    document.getElementById('delete-modal').classList.add('open');
+  }
+
+  function closeDeleteModal() {
+    deleteTargetId = null;
+    document.getElementById('delete-modal').classList.remove('open');
+  }
+
+  async function confirmDelete() {
+    if (!deleteTargetId) return;
+    const { error } = await _supa.from('question_history').delete().eq('id', deleteTargetId);
+    if (error) { showToast('❌ Error deleting'); return; }
+    allHistory = allHistory.filter(h => h.id !== deleteTargetId);
+    document.getElementById('item-' + deleteTargetId)?.remove();
+    closeDeleteModal();
+    showToast('🗑️ Deleted');
+    // Update total count
+    const totalEl = document.getElementById('stat-total');
+    totalEl.textContent = parseInt(totalEl.textContent) - 1;
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diff = now - d;
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+    if (diff < 604800000) return Math.floor(diff/86400000) + 'd ago';
+    return d.toLocaleDateString('en-PK', { day: 'numeric', month: 'short' });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function stripHtml(html) {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+  }
+
+  init();
+</script>
+</body>
+</html>
