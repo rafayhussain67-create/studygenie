@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyGenie — Shared Answer</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --green: #1a9e6e; --green-light: #e6f7f1; --green-dark: #0d6b4a; --text: #0f1117; --text-muted: #6b7280; --border: #e5e7eb; --bg: #f9fafb; --white: #fff; --font-head: 'Sora', sans-serif; --font-body: 'DM Sans', sans-serif; }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; }
+  nav { background: var(--white); border-bottom: 1px solid var(--border); height: 60px; display: flex; align-items: center; padding: 0 5%; justify-content: space-between; }
+  .logo { font-family: var(--font-head); font-size: 19px; font-weight: 800; color: var(--green); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+  .logo-mark { width: 32px; height: 32px; background: var(--green); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+  .page { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+  .shared-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--green-light); color: var(--green-dark); border: 1px solid rgba(26,158,110,0.3); border-radius: 20px; padding: 5px 14px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+  .question-box { background: var(--green); color: white; border-radius: 14px 14px 4px 14px; padding: 16px 20px; font-size: 15px; font-weight: 600; margin-bottom: 16px; line-height: 1.5; }
+  .answer-box { background: var(--white); border: 1px solid var(--border); border-radius: 4px 14px 14px 14px; padding: 20px; font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
+  .meta { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 8px; background: var(--green-light); color: var(--green-dark); }
+  .cta { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-top: 28px; text-align: center; }
+  .cta h3 { font-family: var(--font-head); font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .cta p { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; }
+  .btn { display: inline-block; background: var(--green); color: white; border: none; border-radius: 10px; padding: 12px 28px; font-family: var(--font-head); font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; transition: background 0.15s; }
+  .btn:hover { background: var(--green-dark); }
+  .error { text-align: center; padding: 60px 20px; }
+  .error-icon { font-size: 48px; margin-bottom: 12px; }
+  .dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: bop 1.2s infinite; display: inline-block; margin: 0 3px; }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bop { 0%,80%,100%{transform:translateY(0);opacity:0.4}40%{transform:translateY(-6px);opacity:1} }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo"><div class="logo-mark">✦</div>StudyGenie</a>
+  <a href="login.html" style="background:var(--green);color:white;border:none;border-radius:8px;padding:8px 16px;font-family:var(--font-body);font-size:13px;font-weight:600;text-decoration:none">Try for free →</a>
+</nav>
+
+<div class="page" id="page">
+  <div style="text-align:center;padding:60px 20px">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <p style="margin-top:12px;font-size:14px;color:var(--text-muted)">Loading answer...</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script>
+  async function init() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (!token) { showError('No share token found in URL.'); return; }
+
+    const { data, error } = await _supa
+      .from('shared_answers')
+      .select('*')
+      .eq('share_token', token)
+      .single();
+
+    if (error || !data) { showError('This link is invalid or has been deleted.'); return; }
+
+    document.title = 'StudyGenie — ' + data.question.substring(0, 50);
+
+    document.getElementById('page').innerHTML = `
+      <div class="shared-badge">🔗 Shared from StudyGenie</div>
+      <div class="meta">
+        ${data.subject ? `<span class="badge">${data.subject}</span>` : ''}
+        ${data.level ? `<span class="badge">${data.level}</span>` : ''}
+        <span class="badge" style="background:var(--bg);color:var(--text-muted)">${formatDate(data.created_at)}</span>
+      </div>
+      <div class="question-box">${escapeHtml(data.question)}</div>
+      <div class="answer-box">${escapeHtml(data.answer)}</div>
+      <div class="cta">
+        <h3>Get AI answers for your questions too</h3>
+        <p>StudyGenie gives Pakistani students step-by-step answers for Matric, Inter, O-Levels & A-Levels. Free to try.</p>
+        <a href="login.html" class="btn">Start for free — 5 questions/day →</a>
+      </div>`;
+  }
+
+  function showError(msg) {
+    document.getElementById('page').innerHTML = `
+      <div class="error">
+        <div class="error-icon">🔗</div>
+        <h3 style="font-family:var(--font-head);font-size:20px;margin-bottom:8px">Link not found</h3>
+        <p style="color:var(--text-muted);margin-bottom:20px">${msg}</p>
+        <a href="index.html" class="btn">Go to StudyGenie</a>
+      </div>`;
+  }
+
+  function formatDate(str) {
+    return new Date(str).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function escapeHtml(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  init();
+</script>
+</body>
+</html>
