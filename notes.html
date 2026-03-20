@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyGenie — My Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #1a9e6e; --green-light: #e6f7f1; --green-dark: #0d6b4a;
+    --yellow: #f59e0b; --yellow-light: #fffbe6;
+    --text: #0f1117; --text-muted: #6b7280;
+    --border: #e5e7eb; --bg: #f9fafb; --white: #ffffff;
+    --font-head: 'Sora', sans-serif; --font-body: 'DM Sans', sans-serif;
+    --red: #e24b4a; --red-light: #fcebeb;
+  }
+  body.dark {
+    --text: #f1f5f9; --text-muted: #94a3b8;
+    --border: #2d3748; --bg: #0f1117; --white: #1a1f2e;
+    --green-light: #0d2d20; --yellow-light: #2a1f00;
+  }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  nav { background: var(--white); border-bottom: 1px solid var(--border); height: 60px; display: flex; align-items: center; padding: 0 5%; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .logo { font-family: var(--font-head); font-size: 19px; font-weight: 800; color: var(--green); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+  .logo-mark { width: 32px; height: 32px; background: var(--green); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .btn-nav { background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px; padding: 7px 14px; font-family: var(--font-body); font-size: 13px; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+  .btn-nav:hover { border-color: var(--green); color: var(--green); }
+
+  .page { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .page-header h1 { font-family: var(--font-head); font-size: 26px; font-weight: 800; }
+  .btn-new { background: var(--yellow); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-family: var(--font-head); font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+  .btn-new:hover { background: #d97706; }
+
+  .search-row { display: flex; gap: 10px; margin-bottom: 20px; }
+  .search-input { flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-family: var(--font-body); font-size: 14px; color: var(--text); background: var(--white); outline: none; transition: border-color 0.15s; }
+  .search-input:focus { border-color: var(--yellow); }
+  .tag-filter { border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-family: var(--font-body); font-size: 14px; color: var(--text); background: var(--white); outline: none; cursor: pointer; }
+
+  .notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .note-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s; position: relative; }
+  .note-card:hover { border-color: var(--yellow); box-shadow: 0 4px 16px rgba(245,158,11,0.1); transform: translateY(-2px); }
+  .note-title { font-family: var(--font-head); font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+  .note-preview { font-size: 13px; color: var(--text-muted); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 12px; }
+  .note-footer { display: flex; align-items: center; justify-content: space-between; }
+  .note-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: var(--yellow-light); color: var(--yellow); }
+  .note-date { font-size: 11px; color: var(--text-muted); }
+  .note-del { position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; font-size: 16px; color: var(--text-muted); opacity: 0; transition: opacity 0.15s; padding: 4px; }
+  .note-card:hover .note-del { opacity: 1; }
+  .note-del:hover { color: var(--red); }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty h3 { font-family: var(--font-head); font-size: 18px; margin-bottom: 6px; color: var(--text); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--white); border-radius: 20px; padding: 28px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative; }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .modal-header h2 { font-family: var(--font-head); font-size: 20px; font-weight: 800; }
+  .modal-close { background: var(--bg); border: none; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; font-size: 16px; color: var(--text-muted); }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .form-input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-family: var(--font-body); font-size: 14px; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s; }
+  .form-input:focus { border-color: var(--yellow); }
+  textarea.form-input { resize: vertical; min-height: 160px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+  .btn-save { background: var(--yellow); color: white; border: none; border-radius: 10px; padding: 11px 24px; font-family: var(--font-head); font-size: 14px; font-weight: 700; cursor: pointer; }
+  .btn-save:hover { background: #d97706; }
+  .btn-cancel-modal { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); border-radius: 10px; padding: 11px 20px; font-family: var(--font-body); font-size: 14px; cursor: pointer; }
+
+  .dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: bop 1.2s infinite; display: inline-block; margin: 0 3px; }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bop { 0%,80%,100%{transform:translateY(0);opacity:0.4}40%{transform:translateY(-6px);opacity:1} }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: var(--white); padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 9999; transition: transform 0.3s; pointer-events: none; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="app.html" class="logo"><div class="logo-mark">✦</div>StudyGenie</a>
+  <div class="nav-right">
+    <a href="app.html" class="btn-nav">← Back to Chat</a>
+    <a href="history.html" class="btn-nav">📋 History</a>
+    <button class="btn-nav" onclick="toggleDark()" id="dark-btn">🌙</button>
+    <button class="btn-nav" onclick="signOut()" style="color:#e24b4a;border-color:#e24b4a">Sign Out</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>📝 My Notes</h1>
+    <button class="btn-new" onclick="openNewNote()">+ New Note</button>
+  </div>
+
+  <div class="search-row">
+    <input type="text" class="search-input" id="search-input" placeholder="Search notes..." oninput="filterNotes()">
+    <select class="tag-filter" id="tag-filter" onchange="filterNotes()">
+      <option value="">All tags</option>
+    </select>
+  </div>
+
+  <div id="notes-container">
+    <div style="text-align:center;padding:40px">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <p style="margin-top:12px;font-size:14px;color:var(--text-muted)">Loading notes...</p>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="modal-overlay" id="note-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">New Note</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" class="form-input" id="note-title" placeholder="Note title...">
+    </div>
+    <div class="form-group">
+      <label>Content</label>
+      <textarea class="form-input" id="note-content" placeholder="Write your note here..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Tags <span style="color:var(--text-muted);font-weight:400">(comma separated, e.g. Physics, Chapter 3)</span></label>
+      <input type="text" class="form-input" id="note-tags" placeholder="e.g. Physics, Kinematics">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel-modal" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveNote()">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script>
+  let allNotes = [];
+  let editingNoteId = null;
+
+  if (localStorage.getItem('studygenie-dark') === 'true') {
+    document.body.classList.add('dark');
+    document.getElementById('dark-btn').textContent = '☀️';
+  }
+  function toggleDark() {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    document.getElementById('dark-btn').textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('studygenie-dark', isDark);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  async function init() {
+    const { data: { session } } = await _supa.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    loadNotes(session.user.id);
+  }
+
+  async function loadNotes(userId) {
+    const { data, error } = await _supa
+      .from('notes')
+      .select('*')
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false });
+
+    if (error) {
+      document.getElementById('notes-container').innerHTML = '<p style="text-align:center;color:#e24b4a;padding:40px">Error loading notes.</p>';
+      return;
+    }
+
+    allNotes = data || [];
+    populateTagFilter();
+    renderNotes(allNotes);
+  }
+
+  function populateTagFilter() {
+    const allTags = new Set();
+    allNotes.forEach(n => (n.tags || []).forEach(t => allTags.add(t)));
+    const select = document.getElementById('tag-filter');
+    select.innerHTML = '<option value="">All tags</option>';
+    allTags.forEach(tag => {
+      const opt = document.createElement('option');
+      opt.value = tag; opt.textContent = tag;
+      select.appendChild(opt);
+    });
+  }
+
+  function renderNotes(notes) {
+    const container = document.getElementById('notes-container');
+    if (!notes.length) {
+      container.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">📝</div>
+          <h3>No notes yet</h3>
+          <p>Save answers from chat or create your own notes using the button above</p>
+        </div>`;
+      return;
+    }
+    container.innerHTML = `<div class="notes-grid">${notes.map(note => `
+      <div class="note-card" onclick="openEditNote('${note.id}')">
+        <button class="note-del" onclick="event.stopPropagation(); deleteNote('${note.id}')">🗑️</button>
+        <div class="note-title">${escapeHtml(note.title || 'Untitled')}</div>
+        <div class="note-preview">${escapeHtml(note.content)}</div>
+        <div class="note-footer">
+          <div class="note-tags">${(note.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+          <div class="note-date">${formatDate(note.updated_at)}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  function filterNotes() {
+    const search = document.getElementById('search-input').value.toLowerCase();
+    const tag = document.getElementById('tag-filter').value;
+    const filtered = allNotes.filter(n => {
+      const matchSearch = !search || (n.title || '').toLowerCase().includes(search) || n.content.toLowerCase().includes(search);
+      const matchTag = !tag || (n.tags || []).includes(tag);
+      return matchSearch && matchTag;
+    });
+    renderNotes(filtered);
+  }
+
+  function openNewNote() {
+    editingNoteId = null;
+    document.getElementById('modal-title').textContent = 'New Note';
+    document.getElementById('note-title').value = '';
+    document.getElementById('note-content').value = '';
+    document.getElementById('note-tags').value = '';
+    document.getElementById('note-modal').classList.add('open');
+    setTimeout(() => document.getElementById('note-title').focus(), 100);
+  }
+
+  function openEditNote(id) {
+    const note = allNotes.find(n => n.id === id);
+    if (!note) return;
+    editingNoteId = id;
+    document.getElementById('modal-title').textContent = 'Edit Note';
+    document.getElementById('note-title').value = note.title || '';
+    document.getElementById('note-content').value = note.content || '';
+    document.getElementById('note-tags').value = (note.tags || []).join(', ');
+    document.getElementById('note-modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('note-modal').classList.remove('open');
+    editingNoteId = null;
+  }
+
+  async function saveNote() {
+    const title = document.getElementById('note-title').value.trim();
+    const content = document.getElementById('note-content').value.trim();
+    const tagsRaw = document.getElementById('note-tags').value.trim();
+    if (!content) { showToast('⚠️ Please write something in the note'); return; }
+    const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+    const user = await getUser();
+    if (!user) return;
+
+    if (editingNoteId) {
+      const { error } = await _supa.from('notes').update({ title, content, tags }).eq('id', editingNoteId);
+      if (error) { showToast('❌ Error saving'); return; }
+      const idx = allNotes.findIndex(n => n.id === editingNoteId);
+      if (idx !== -1) allNotes[idx] = { ...allNotes[idx], title, content, tags, updated_at: new Date().toISOString() };
+      showToast('✅ Note updated!');
+    } else {
+      const { data, error } = await _supa.from('notes').insert({ user_id: user.id, title, content, tags }).select().single();
+      if (error) { showToast('❌ Error saving'); return; }
+      allNotes.unshift(data);
+      showToast('📝 Note saved!');
+    }
+
+    closeModal();
+    populateTagFilter();
+    renderNotes(allNotes);
+  }
+
+  async function deleteNote(id) {
+    if (!confirm('Delete this note?')) return;
+    const { error } = await _supa.from('notes').delete().eq('id', id);
+    if (error) { showToast('❌ Error deleting'); return; }
+    allNotes = allNotes.filter(n => n.id !== id);
+    renderNotes(allNotes);
+    showToast('🗑️ Note deleted');
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diff = now - d;
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+    if (diff < 604800000) return Math.floor(diff/86400000) + 'd ago';
+    return d.toLocaleDateString('en-PK', { day: 'numeric', month: 'short' });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Close modal on outside click
+  document.getElementById('note-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('note-modal')) closeModal();
+  });
+
+  init();
+</script>
+</body>
+</html>
