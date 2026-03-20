@@ -370,6 +370,7 @@
     <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙</button>
     <a href="index.html" class="btn-home">← Home</a>
     <a href="history.html" class="btn-home" style="color:#6366f1;border-color:#6366f1">📋 History</a>
+    <a href="notes.html" class="btn-home" style="color:#f59e0b;border-color:#f59e0b">📝 Notes</a>
     <button class="btn-home" onclick="signOut()" style="color:#e24b4a;border-color:#e24b4a">Sign Out</button>
   </div>
 </nav>
@@ -632,6 +633,29 @@
   let currentProfile = null;
 
   // ── AUTH GUARD ──────────────────────────────
+  // Save answer as note
+  const msgAnswerMap = {}; // msgId -> {question, answer}
+
+  function trackMsg(msgId, question, answer) {
+    msgAnswerMap[msgId] = { question, answer };
+  }
+
+  async function saveAsNote(msgId) {
+    const data = msgAnswerMap[msgId];
+    if (!data) { showToast('❌ Could not find answer'); return; }
+    const user = await getUser();
+    if (!user) { showToast('❌ Please sign in'); return; }
+    const title = data.question.substring(0, 80);
+    const { error } = await _supa.from('notes').insert({
+      user_id: user.id,
+      title,
+      content: data.question + '\n\n' + data.answer.replace(/<[^>]*>/g, ''),
+      tags: sub ? [sub] : []
+    });
+    if (error) { showToast('❌ Error saving note'); return; }
+    showToast('📝 Saved to notes!');
+  }
+
   async function initAuth() {
     const { data: { session } } = await _supa.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
@@ -983,7 +1007,9 @@
       const data = await res.json();
       removeLoader();
       const answer = data.answer || 'Sorry, something went wrong. Please try again.';
+      const newMsgId = 'msg-' + msgCounter; // track before addMsg increments
       addMsg('ai', answer);
+      trackMsg('msg-' + (msgCounter - 1), q, answer);
       if(currentImageBase64) removeImage();
       // Save to history in Supabase
       saveToHistory(q, answer, sub, lvl);
@@ -1205,6 +1231,8 @@
   function showQuizResult() {
     const total = quizQuestions.length;
     const pct = Math.round((quizScore / total) * 100);
+    // Save quiz result to Supabase
+    saveQuizResult(lastQuizTopic, sub, lvl, quizScore, total, quizQuestions);
     document.getElementById('quiz-progress-fill').style.width = '100%';
     document.getElementById('quiz-progress-text').textContent = total + ' / ' + total;
     let msg = pct === 100 ? 'Perfect score! 🎉 Amazing!' : pct >= 70 ? 'Great job! Keep it up! 💪' : pct >= 40 ? 'Good effort! Review the topics again.' : "Keep studying! You'll get there.";
