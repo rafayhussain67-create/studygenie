@@ -369,6 +369,7 @@
     <button class="btn-home" onclick="openFormulas()" style="border-color:#7c3aed;color:#7c3aed">📐 Formulas</button>
     <button class="dark-toggle" onclick="toggleDark()" id="dark-btn">🌙</button>
     <a href="index.html" class="btn-home">← Home</a>
+    <button class="btn-home" onclick="signOut()" style="color:#e24b4a;border-color:#e24b4a">Sign Out</button>
   </div>
 </nav>
 
@@ -626,6 +627,63 @@
 
 <script>
   let credits = 5, sub = '', lvl = '', busy = false, started = false, plan = 'scholar', board = '';
+  let currentUser = null;
+  let currentProfile = null;
+
+  // ── AUTH GUARD ──────────────────────────────
+  async function initAuth() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    currentUser = session.user;
+    currentProfile = await getProfile();
+    if (currentProfile) {
+      plan = currentProfile.plan || 'free';
+      // Restore saved level
+      if (currentProfile.level) {
+        lvl = currentProfile.level;
+        document.getElementById('level-display-text').textContent = lvl;
+        document.getElementById('lvl-label').textContent = lvl;
+        document.getElementById('onboarding').classList.add('hidden');
+        updateChips(lvl);
+      }
+    }
+    await refreshCredits();
+    await loadStreakFromDB();
+    updateUserUI();
+  }
+
+  async function refreshCredits() {
+    const remaining = await getRemainingQuestions();
+    credits = remaining === Infinity ? 9999 : remaining;
+    document.getElementById('cr').textContent = credits === 9999 ? '∞' : credits;
+    document.getElementById('cr2').textContent = credits === 9999 ? '∞' : credits;
+  }
+
+  async function loadStreakFromDB() {
+    const s = await getStreak();
+    const el = document.getElementById('streak-count');
+    if (el) el.textContent = s.current_streak + ' day' + (s.current_streak !== 1 ? 's' : '');
+  }
+
+  function updateUserUI() {
+    if (!currentProfile) return;
+    const name = currentProfile.full_name || currentUser.email;
+    // Update upgrade button text based on plan
+    const upgradeBtn = document.querySelector('.btn-upgrade');
+    if (upgradeBtn) {
+      if (currentProfile.plan === 'pro') upgradeBtn.textContent = '⭐ Pro Plan';
+      else if (currentProfile.plan === 'scholar') upgradeBtn.textContent = '⭐ Scholar Plan';
+      else if (currentProfile.plan === 'starter') upgradeBtn.textContent = '⭐ Starter Plan';
+    }
+  }
+
+  // Save level to Supabase when user picks it
+  async function saveLevelToDB(level) {
+    if (!currentUser) return;
+    await supabase.from('profiles').update({ level }).eq('id', currentUser.id);
+  }
+
+  initAuth();
   let currentImageBase64 = null;
   let chatHistory = [];
 
@@ -706,9 +764,10 @@
     document.getElementById('lvl-label').textContent = level;
     document.getElementById('onboarding').classList.add('hidden');
     updateChips(level);
+    saveLevelToDB(level); // Save to Supabase
   }
 
-  // Auto-skip onboarding if level was already chosen
+  // Auto-skip onboarding if level was already chosen (localStorage fallback)
   const savedLevel = localStorage.getItem('sg-level');
   if (savedLevel) {
     lvl = savedLevel;
@@ -882,8 +941,9 @@
     if(credits<=0) { openModal(); return; }
 
     credits--;
-    document.getElementById('cr').textContent=credits;
-    document.getElementById('cr2').textContent=credits;
+    document.getElementById('cr').textContent = credits === 9998 ? '∞' : credits;
+    document.getElementById('cr2').textContent = credits === 9998 ? '∞' : credits;
+    await incrementQuestionUsage(); // Track in Supabase
     inp.value=''; inp.style.height='50px';
 
     if(!started) {
@@ -913,8 +973,11 @@
       });
       const data = await res.json();
       removeLoader();
-      addMsg('ai', data.answer || 'Sorry, something went wrong. Please try again.');
+      const answer = data.answer || 'Sorry, something went wrong. Please try again.';
+      addMsg('ai', answer);
       if(currentImageBase64) removeImage();
+      // Save to history in Supabase
+      saveToHistory(q, answer, sub, lvl);
     } catch(e) {
       removeLoader();
       addMsg('ai','<p>Connection error. Please check your internet and try again.</p>');
@@ -1492,17 +1555,12 @@
   // ============================================
   // STUDY STREAK
   // ============================================
-  function updateStreak() {
-    const today = new Date().toDateString();
-    const data = JSON.parse(localStorage.getItem('sg-streak') || '{"streak":0,"longest":0,"last":""}');
-    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
-    if(data.last === today) return;
-    if(data.last === yesterday.toDateString()) { data.streak += 1; }
-    else if(data.last !== today) { data.streak = 1; }
-    data.longest = Math.max(data.longest, data.streak);
-    data.last = today;
-    localStorage.setItem('sg-streak', JSON.stringify(data));
-    document.getElementById('streak-count').textContent = data.streak + ' day' + (data.streak !== 1 ? 's' : '');
+  async function updateStreak() {
+    const s = await updateStreak(); // from supabase.js
+    if (s) {
+      const el = document.getElementById('streak-count');
+      if (el) el.textContent = s.current_streak + ' day' + (s.current_streak !== 1 ? 's' : '');
+    }
   }
 
   function loadStreak() {
@@ -1672,6 +1730,8 @@
   }
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";</script>
 </body>
