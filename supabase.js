@@ -4,7 +4,8 @@
 const SUPABASE_URL = 'https://joildbbqsisdoqayfwus.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6WADiIvIXFdVLlVuVqVU6w_YAnD8TMO';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const { createClient } = window.supabase;
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─────────────────────────────────────────────
 // AUTH HELPERS
