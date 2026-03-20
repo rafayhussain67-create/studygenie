@@ -371,6 +371,7 @@
     <a href="index.html" class="btn-home">← Home</a>
     <a href="history.html" class="btn-home" style="color:#6366f1;border-color:#6366f1">📋 History</a>
     <a href="notes.html" class="btn-home" style="color:#f59e0b;border-color:#f59e0b">📝 Notes</a>
+    <a href="leaderboard.html" class="btn-home" style="color:#6366f1;border-color:#6366f1">🏆 Leaderboard</a>
     <button class="btn-home" onclick="signOut()" style="color:#e24b4a;border-color:#e24b4a">Sign Out</button>
   </div>
 </nav>
@@ -638,6 +639,32 @@
 
   function trackMsg(msgId, question, answer) {
     msgAnswerMap[msgId] = { question, answer };
+  }
+
+  // Share answer — saves to Supabase and copies link
+  async function shareAnswer(msgId) {
+    const data = msgAnswerMap[msgId];
+    if (!data) { showToast('❌ Could not find answer'); return; }
+    const user = await getUser();
+    if (!user) { showToast('❌ Please sign in'); return; }
+    showToast('🔗 Creating share link...');
+    try {
+      const { data: shared, error } = await _supa
+        .from('shared_answers')
+        .insert({
+          created_by: user.id,
+          question: data.question,
+          answer: data.answer.replace(/<[^>]*>/g, ''),
+          subject: sub,
+          level: lvl
+        })
+        .select('share_token')
+        .single();
+      if (error) { showToast('❌ Error creating link'); return; }
+      const shareUrl = window.location.origin + '/shared.html?token=' + shared.share_token;
+      await navigator.clipboard.writeText(shareUrl);
+      showToast('✅ Link copied! Share it with anyone.');
+    } catch(e) { showToast('❌ Error: ' + e.message); }
   }
 
   async function saveAsNote(msgId) {
@@ -943,7 +970,8 @@
         <button class="ans-btn" id="dislike-${msgId}" onclick="rateAnswer('${msgId}','dislike')">👎</button>
         <button class="ans-btn" onclick="regenerateAnswer('${msgId}')">🔄 Regenerate</button>
         <button class="ans-btn" onclick="copyAnswer('${msgId}')">📋 Copy</button>
-        <button class="ans-btn" onclick="saveAsNote('${msgId}')" style="color:#f59e0b;border-color:#f59e0b">📝 Save note</button>`;
+        <button class="ans-btn" onclick="saveAsNote('${msgId}')" style="color:#f59e0b;border-color:#f59e0b">📝 Save note</button>
+        <button class="ans-btn" onclick="shareAnswer('${msgId}')" style="color:#6366f1;border-color:#6366f1">🔗 Share</button>`;
       b.appendChild(actionBar);
 
       const actions = document.createElement('div');
@@ -1008,13 +1036,17 @@
     const q = inp.value.trim();
     if(!q) return;
     // Re-check from Supabase each time to prevent refresh bypass
-    const freshRemaining = await getRemainingQuestions();
-    if(freshRemaining !== Infinity && freshRemaining <= 0) {
-      openModal();
-      credits = 0;
-      document.getElementById('cr').textContent = '0';
-      document.getElementById('cr2').textContent = '0';
-      return;
+    const ADMIN_EMAILS = ['rafayhussain67@gmail.com'];
+    const isAdmin = currentUser && ADMIN_EMAILS.includes(currentUser.email);
+    if (!isAdmin) {
+      const freshRemaining = await getRemainingQuestions();
+      if(freshRemaining !== Infinity && freshRemaining <= 0) {
+        openModal();
+        credits = 0;
+        document.getElementById('cr').textContent = '0';
+        document.getElementById('cr2').textContent = '0';
+        return;
+      }
     }
 
     credits--;
@@ -1651,7 +1683,8 @@
         <button class="ans-btn" id="dislike-${msgId}" onclick="rateAnswer('${msgId}','dislike')">👎</button>
         <button class="ans-btn" onclick="regenerateAnswer('${msgId}')">🔄 Regenerate</button>
         <button class="ans-btn" onclick="copyAnswer('${msgId}')">📋 Copy</button>
-        <button class="ans-btn" onclick="saveAsNote('${msgId}')" style="color:#f59e0b;border-color:#f59e0b">📝 Save note</button>`;
+        <button class="ans-btn" onclick="saveAsNote('${msgId}')" style="color:#f59e0b;border-color:#f59e0b">📝 Save note</button>
+        <button class="ans-btn" onclick="shareAnswer('${msgId}')" style="color:#6366f1;border-color:#6366f1">🔗 Share</button>`;
       bubble.appendChild(newBar);
       trackMsg(msgId, lastQ, newAnswer);
     } catch(e) { bubble.innerHTML = 'Error regenerating. Please try again.'; }
