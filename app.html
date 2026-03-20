@@ -663,14 +663,15 @@
     currentProfile = await getProfile();
     if (currentProfile) {
       plan = currentProfile.plan || 'free';
-      // Restore saved level
       if (currentProfile.level) {
+        // Returning user — show "continue with saved board" prompt
         lvl = currentProfile.level;
         document.getElementById('level-display-text').textContent = lvl;
         document.getElementById('lvl-label').textContent = lvl;
-        document.getElementById('onboarding').classList.add('hidden');
         updateChips(lvl);
+        showBoardConfirm(currentProfile.level);
       }
+      // else: new user — onboarding already shows
     }
     await refreshCredits();
     await loadStreakFromDB();
@@ -700,6 +701,40 @@
       else if (currentProfile.plan === 'scholar') upgradeBtn.textContent = '⭐ Scholar Plan';
       else if (currentProfile.plan === 'starter') upgradeBtn.textContent = '⭐ Starter Plan';
     }
+  }
+
+  // Show board confirm for returning users
+  function showBoardConfirm(savedLevel) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'board-confirm';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;display:flex;align-items:center;justify-content:center;padding:24px';
+    overlay.innerHTML = `
+      <div style="background:var(--white);border-radius:20px;padding:32px;max-width:440px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+        <div style="font-size:36px;margin-bottom:12px">📚</div>
+        <h2 style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:8px">Welcome back!</h2>
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px">Continue studying as <strong>${savedLevel}</strong>?</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button onclick="confirmBoard('${savedLevel}')" style="background:var(--green);color:white;border:none;border-radius:10px;padding:12px 24px;font-family:var(--font-head);font-size:14px;font-weight:700;cursor:pointer">
+            Continue as ${savedLevel}
+          </button>
+          <button onclick="changeBoard()" style="background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:10px;padding:12px 24px;font-family:var(--font-body);font-size:14px;cursor:pointer">
+            Change board
+          </button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  }
+
+  function confirmBoard(level) {
+    document.getElementById('board-confirm')?.remove();
+    lvl = level;
+    document.getElementById('onboarding').classList.add('hidden');
+  }
+
+  function changeBoard() {
+    document.getElementById('board-confirm')?.remove();
+    document.getElementById('onboarding').classList.remove('hidden');
   }
 
   // Save level to Supabase when user picks it
@@ -972,7 +1007,15 @@
     const inp = document.getElementById('q');
     const q = inp.value.trim();
     if(!q) return;
-    if(credits<=0) { openModal(); return; }
+    // Re-check from Supabase each time to prevent refresh bypass
+    const freshRemaining = await getRemainingQuestions();
+    if(freshRemaining !== Infinity && freshRemaining <= 0) {
+      openModal();
+      credits = 0;
+      document.getElementById('cr').textContent = '0';
+      document.getElementById('cr2').textContent = '0';
+      return;
+    }
 
     credits--;
     document.getElementById('cr').textContent = credits === 9998 ? '∞' : credits;
@@ -1093,6 +1136,7 @@
   function closeQuiz() {
     document.getElementById('quiz-page').classList.remove('active');
     document.querySelector('.layout').style.display = 'flex';
+    // Don't reset chat — preserve whatever was there
   }
 
   function selectQuizMode(mode) {
@@ -1566,10 +1610,19 @@
   // ============================================
   const ratings = {};
   function rateAnswer(msgId, type) {
-    if(ratings[msgId]) return;
-    ratings[msgId] = type;
     const likeBtn = document.getElementById('like-' + msgId);
     const dislikeBtn = document.getElementById('dislike-' + msgId);
+    // Allow toggling between like and dislike
+    if(ratings[msgId] === type) {
+      // clicking same button → deselect
+      ratings[msgId] = null;
+      likeBtn.classList.remove('liked');
+      dislikeBtn.classList.remove('disliked');
+      return;
+    }
+    ratings[msgId] = type;
+    likeBtn.classList.remove('liked');
+    dislikeBtn.classList.remove('disliked');
     if(type === 'like') { likeBtn.classList.add('liked'); showToast('👍 Thanks for the feedback!'); }
     else { dislikeBtn.classList.add('disliked'); showToast('👎 Got it — noted!'); }
   }
