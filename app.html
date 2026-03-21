@@ -715,7 +715,7 @@
         document.getElementById('level-display-text').textContent = lvl;
         document.getElementById('lvl-label').textContent = lvl;
         updateChips(lvl);
-        showBoardConfirm(currentProfile.level);
+        setTimeout(() => showBoardConfirm(currentProfile.level), 100);
       }
       // else: new user — onboarding already shows
     }
@@ -751,7 +751,8 @@
 
   // Show board confirm for returning users
   function showBoardConfirm(savedLevel) {
-    // Create overlay
+    // Hide onboarding first so it doesn't show behind the overlay
+    document.getElementById('onboarding').classList.add('hidden');
     const overlay = document.createElement('div');
     overlay.id = 'board-confirm';
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;display:flex;align-items:center;justify-content:center;padding:24px';
