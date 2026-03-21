@@ -48,6 +48,13 @@
 
   /* ANSWER ACTION BAR */
   .answer-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 8px 0 0; border-top: 1px solid var(--border); margin-top: 10px; }
+  /* MODE TOGGLE BAR */
+  .mode-bar { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0; flex-wrap: wrap; }
+  .mode-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-right: 4px; }
+  .mode-btn { padding: 4px 12px; border: 1.5px solid var(--border); border-radius: 20px; background: var(--white); color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: all 0.15s; }
+  .mode-btn:hover { border-color: var(--green); color: var(--green); }
+  .mode-btn.active { background: var(--green); color: white; border-color: var(--green); }
+  .mode-btn.eli5 { }
   .ans-btn { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 8px; background: none; cursor: pointer; font-size: 12px; color: var(--text-muted); font-family: var(--font-body); transition: all 0.12s; }
   .ans-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
   .ans-btn.liked { border-color: var(--green); color: var(--green); background: var(--green-light); }
@@ -372,6 +379,8 @@
     <a href="history.html" class="btn-home" style="color:#6366f1;border-color:#6366f1">📋 History</a>
     <a href="notes.html" class="btn-home" style="color:#f59e0b;border-color:#f59e0b">📝 Notes</a>
     <a href="leaderboard.html" class="btn-home" style="color:#6366f1;border-color:#6366f1">🏆 Leaderboard</a>
+    <a href="pastpapers.html" class="btn-home" style="color:#e24b4a;border-color:#e24b4a">📋 Past Papers</a>
+    <a href="analytics.html" class="btn-home" style="color:#f59e0b;border-color:#f59e0b">📊 Analytics</a>
     <button class="btn-home" onclick="signOut()" style="color:#e24b4a;border-color:#e24b4a">Sign Out</button>
   </div>
 </nav>
@@ -399,6 +408,15 @@
 
   <main class="main">
     <!-- EXAM COUNTDOWN BAR -->
+    <!-- ANSWER MODE BAR -->
+    <div class="mode-bar" id="mode-bar">
+      <span class="mode-label">Answer mode:</span>
+      <button class="mode-btn active" id="mode-normal" onclick="setMode('normal')">📝 Normal</button>
+      <button class="mode-btn" id="mode-quick" onclick="setMode('quick')">⚡ Quick</button>
+      <button class="mode-btn" id="mode-detailed" onclick="setMode('detailed')">📖 Detailed</button>
+      <button class="mode-btn eli5" id="mode-eli5" onclick="setMode('eli5')">🧒 ELI5</button>
+    </div>
+
     <div class="exam-bar" id="exam-bar">
       <div class="exam-chips-row" id="exam-chips-row"></div>
       <button class="add-exam-btn" onclick="openExamModal()">+ Add exam date</button>
@@ -630,6 +648,7 @@
 
 <script>
   let credits = 5, sub = '', lvl = '', busy = false, started = false, plan = 'scholar', board = '';
+  let answerMode = 'normal'; // normal | quick | detailed | eli5 | urdu
   let currentUser = null;
   let currentProfile = null;
 
@@ -983,7 +1002,8 @@
         <div class="dots-menu" id="dm-${msgId}">
           <button class="dots-menu-item" id="translate-btn-${msgId}" onclick="toggleTranslation('${msgId}','dm-${msgId}')">🇵🇰 Translate to Urdu</button>
           <button class="dots-menu-item" onclick="explainSimpler('${msgId}','dm-${msgId}')">💡 Explain simpler</button>
-          <button class="dots-menu-item locked" onclick="explainDetailed('${msgId}','dm-${msgId}')">📖 Explain in more detail <span class="lock-icon">PRO</span></button>
+          <button class="dots-menu-item" onclick="explainDetailed('${msgId}','dm-${msgId}')">📖 Explain in more detail</button>
+          <button class="dots-menu-item" onclick="explainELI5('${msgId}','dm-${msgId}')">🧒 Explain like I'm 5</button>
         </div>`;
 
       wrap.appendChild(actions);
@@ -1078,7 +1098,7 @@
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q || 'Solve this question from the image', subject: sub, level: lvl, image: currentImageBase64, board: board })
+        body: JSON.stringify({ question: q || 'Solve this question from the image', subject: sub, level: lvl, image: currentImageBase64, board: board, mode: answerMode === 'detailed' ? 'detailed' : null, eli5: answerMode === 'eli5', quickAnswer: answerMode === 'quick' })
       });
       const data = await res.json();
       removeLoader();
@@ -1470,7 +1490,38 @@
 
   async function explainDetailed(msgId, menuId) {
     document.getElementById(menuId).classList.remove('open');
-    openModal();
+    const bubble = document.getElementById(msgId);
+    if(!bubble) return;
+    const original = bubble.innerHTML;
+    const text = original.replace(/<[^>]*>/g,'').substring(0,500);
+    bubble.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: 'Explain this in much more detail with extra examples, real-world applications, and exam tips: ' + text, subject: sub, level: lvl, mode: 'detailed' })
+      });
+      const data = await res.json();
+      bubble.innerHTML = data.answer || original;
+    } catch(e) { bubble.innerHTML = original; }
+  }
+
+  async function explainELI5(msgId, menuId) {
+    document.getElementById(menuId).classList.remove('open');
+    const bubble = document.getElementById(msgId);
+    if(!bubble) return;
+    const original = bubble.innerHTML;
+    const text = original.replace(/<[^>]*>/g,'').substring(0,500);
+    bubble.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: text, subject: sub, level: lvl, eli5: true })
+      });
+      const data = await res.json();
+      bubble.innerHTML = data.answer || original;
+    } catch(e) { bubble.innerHTML = original; }
   }
 
   function togglePlusMenu(e) {
@@ -1575,6 +1626,14 @@
   function flipCard(i) { document.getElementById('fc-'+i).classList.toggle('flipped'); }
   function flipAll() { document.querySelectorAll('.flashcard').forEach(c => c.classList.add('flipped')); }
   function resetAll() { document.querySelectorAll('.flashcard').forEach(c => c.classList.remove('flipped')); }
+
+  function setMode(mode) {
+    answerMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('mode-' + mode).classList.add('active');
+    const labels = { normal: '📝 Normal', quick: '⚡ Quick', detailed: '📖 Detailed', eli5: '🧒 ELI5' };
+    showToast('Mode: ' + labels[mode]);
+  }
 
   function toggleDark() {
     document.body.classList.toggle('dark');
