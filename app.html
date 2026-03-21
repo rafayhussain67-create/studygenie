@@ -1103,9 +1103,9 @@
       const data = await res.json();
       removeLoader();
       const answer = data.answer || 'Sorry, something went wrong. Please try again.';
-      const newMsgId = 'msg-' + msgCounter; // track before addMsg increments
+      const msgIdBeforeAdd = 'msg-' + msgCounter; // capture ID before addMsg increments counter
       addMsg('ai', answer);
-      trackMsg('msg-' + (msgCounter - 1), q, answer);
+      trackMsg(msgIdBeforeAdd, q, answer);
       if(currentImageBase64) removeImage();
       // Save to history in Supabase
       saveToHistory(q, answer, sub, lvl);
