@@ -709,22 +709,22 @@
     currentProfile = await getProfile();
     if (currentProfile) {
       plan = currentProfile.plan || 'free';
-      // Always show board prompt on login
-      // If they have a saved level → "Continue as X or Change"
-      // If no level → show full board picker
       const savedLevel = currentProfile.level || localStorage.getItem('sg-level');
       if (savedLevel) {
+        // Returning user — hide onboarding and show welcome back prompt
+        document.getElementById('onboarding').classList.add('hidden');
         lvl = savedLevel;
         document.getElementById('level-display-text').textContent = lvl;
         document.getElementById('lvl-label').textContent = lvl;
         updateChips(lvl);
-        setTimeout(() => showBoardConfirm(savedLevel), 150);
+        setTimeout(() => showBoardConfirm(savedLevel), 200);
       } else {
-        // New user — onboarding shows normally
-        setTimeout(() => {
-          document.getElementById('onboarding').classList.remove('hidden');
-        }, 150);
+        // New user — show onboarding board picker
+        document.getElementById('onboarding').classList.remove('hidden');
       }
+    } else {
+      // No profile yet — show onboarding
+      document.getElementById('onboarding').classList.remove('hidden');
     }
     await refreshCredits();
     await loadStreakFromDB();
@@ -758,27 +758,25 @@
 
   // Show board confirm for returning users
   function showBoardConfirm(savedLevel) {
-    // Hide onboarding first so it doesn't show behind the overlay
+    // Remove any existing prompt first
+    document.getElementById('board-confirm')?.remove();
     document.getElementById('onboarding').classList.add('hidden');
     const overlay = document.createElement('div');
     overlay.id = 'board-confirm';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;display:flex;align-items:center;justify-content:center;padding:24px';
-    overlay.innerHTML = `
-      <div style="background:var(--white);border-radius:20px;padding:32px;max-width:440px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
-        <div style="font-size:36px;margin-bottom:12px">📚</div>
-        <h2 style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:8px">Welcome back!</h2>
-        <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px">Continue studying as <strong>${savedLevel}</strong>?</p>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-          <button onclick="confirmBoard('${savedLevel}')" style="background:var(--green);color:white;border:none;border-radius:10px;padding:12px 24px;font-family:var(--font-head);font-size:14px;font-weight:700;cursor:pointer">
-            Continue as ${savedLevel}
-          </button>
-          <button onclick="changeBoard()" style="background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:10px;padding:12px 24px;font-family:var(--font-body);font-size:14px;cursor:pointer">
-            Change board
-          </button>
-        </div>
-      </div>`;
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px';
+    const userName = (currentProfile && currentProfile.full_name) ? currentProfile.full_name.split(' ')[0] : 'there';
+    overlay.innerHTML = '<div style="background:var(--white);border-radius:24px;padding:36px 32px;max-width:460px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,0.25)">'
+      + '<div style="font-size:42px;margin-bottom:12px">👋</div>'
+      + '<h2 style="font-family:var(--font-head);font-size:22px;font-weight:800;margin-bottom:8px;color:var(--text)">Hey ' + userName + ', welcome back!</h2>'
+      + '<p style="font-size:14px;color:var(--text-muted);margin-bottom:6px">You were studying as <strong style=\"color:#1a9e6e\">' + savedLevel + '</strong>.</p>'
+      + '<p style="font-size:14px;color:var(--text-muted);margin-bottom:28px">Continue with the same board or switch to a new one?</p>'
+      + '<div style="display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto">'
+      + '<button onclick="confirmBoard(\'' + savedLevel + '\')" style="background:#1a9e6e;color:white;border:none;border-radius:12px;padding:14px 24px;font-family:var(--font-head);font-size:15px;font-weight:700;cursor:pointer;width:100%">✅ Continue as ' + savedLevel + '</button>'
+      + '<button onclick="changeBoard()" style="background:transparent;color:#6b7280;border:1.5px solid #e5e7eb;border-radius:12px;padding:13px 24px;font-family:var(--font-body);font-size:14px;cursor:pointer;width:100%">🔄 Switch to a different board</button>'
+      + '</div></div>';
     document.body.appendChild(overlay);
   }
+
 
   function confirmBoard(level) {
     document.getElementById('board-confirm')?.remove();
