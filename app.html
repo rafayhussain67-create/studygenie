@@ -889,15 +889,7 @@
     saveLevelToDB(level); // Save to Supabase
   }
 
-  // Auto-skip onboarding if level was already chosen (localStorage fallback)
-  const savedLevel = localStorage.getItem('sg-level');
-  if (savedLevel) {
-    lvl = savedLevel;
-    document.getElementById('level-display-text').textContent = savedLevel;
-    document.getElementById('lvl-label').textContent = savedLevel;
-    document.getElementById('onboarding').classList.add('hidden');
-    updateChips(savedLevel);
-  }
+  // Level loading is handled in initAuth() — no auto-skip here
 
   function showOnboarding() {
     document.getElementById('onboarding').classList.remove('hidden');
