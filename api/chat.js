@@ -6,13 +6,102 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { question, subject, level, image, board } = req.body;
+  const { question, subject, level, image, board, mode, eli5, quickAnswer } = req.body;
+
+  // ── PAST PAPER DETECTION ──────────────────────────────────
+  // Detect if student is asking for a specific past paper
+  // Patterns: 9709/mj/23/22, 9709_s23_qp_22, "9709 may june 2023 paper 2"
+  function detectPastPaper(q) {
+    if (!q) return null;
+    const text = q.toLowerCase();
+
+    // Pattern 1: Cambridge code format like 9709/mj/23/22 or 9709/s23/22
+    const slashMatch = q.match(/(\d{4})[\/](mj|oj|ms|on|fm|s|w|m)(\d{2})[\/](\d{1,2})[\/]?(\d)?/i);
+    if (slashMatch) {
+      const syllabus = slashMatch[1];
+      const sessionRaw = slashMatch[2].toLowerCase();
+      const year = slashMatch[3];
+      const paper = slashMatch[4];
+      const variant = slashMatch[5] || '';
+      let session = sessionRaw;
+      if (sessionRaw === 'mj' || sessionRaw === 's') session = 's';
+      else if (sessionRaw === 'oj' || sessionRaw === 'on' || sessionRaw === 'w') session = 'w';
+      else if (sessionRaw === 'fm' || sessionRaw === 'm') session = 'm';
+      return { syllabus, session, year, paper, variant, type: 'cambridge' };
+    }
+
+    // Pattern 2: underscore format 9709_s23_qp_22
+    const underMatch = q.match(/(\d{4})_(s|w|m)(\d{2})_qp_(\d{1,2})/i);
+    if (underMatch) {
+      return { syllabus: underMatch[1], session: underMatch[2].toLowerCase(), year: underMatch[3], paper: underMatch[4], variant: '', type: 'cambridge' };
+    }
+
+    // Pattern 3: natural language "9709 may june 2023 paper 22"
+    const naturalMatch = q.match(/(\d{4}).*?(may.?june|oct.?nov|feb.?march|m.?j|o.?n|f.?m).*?(20)?(\d{2}).*?paper.?(\d{1,2})/i);
+    if (naturalMatch) {
+      const syllabus = naturalMatch[1];
+      const sessionWord = naturalMatch[2].toLowerCase();
+      const year = naturalMatch[4];
+      const paper = naturalMatch[5];
+      let session = 's';
+      if (sessionWord.includes('oct') || sessionWord.includes('nov') || sessionWord.includes('o')) session = 'w';
+      else if (sessionWord.includes('feb') || sessionWord.includes('mar') || sessionWord.includes('f')) session = 'm';
+      return { syllabus, session, year, paper, variant: '', type: 'cambridge' };
+    }
+
+    return null;
+  }
+
+  const paperInfo = detectPastPaper(question);
+  if (paperInfo && !image) {
+    const { syllabus, session, year, paper, variant } = paperInfo;
+    const paperCode = variant ? paper.padStart(1,'0') + variant : paper.padStart(2,'0');
+    const filename = \`\${syllabus}_\${session}\${year}_qp_\${paperCode}.pdf\`;
+    const msFilename = \`\${syllabus}_\${session}\${year}_ms_\${paperCode}.pdf\`;
+    
+    const sessionName = session === 's' ? 'May/June 20' + year : session === 'w' ? 'Oct/Nov 20' + year : 'Feb/March 20' + year;
+    
+    // PapaCambridge search URL
+    const searchUrl = \`https://pastpapers.papacambridge.com/?dir=CAIE/AS+and+A+Level\`;
+    const qpUrl = \`https://pastpapers.papacambridge.com/papers/caie/\${filename}\`;
+    
+    const html = \`<h3>📋 Past Paper Found</h3>
+<div class="step-block">
+  <div class="step-label">Paper Details</div>
+  Syllabus: <strong>\${syllabus}</strong> · Session: <strong>\${sessionName}</strong> · Paper: <strong>\${paper}</strong>
+</div>
+<div class="step-block">
+  <div class="step-label">Download Links</div>
+  <a href="https://pastpapers.papacambridge.com/papers/caie/\${filename}" target="_blank" rel="noopener" style="color:var(--green);font-weight:700">📄 Question Paper (\${filename})</a><br><br>
+  <a href="https://pastpapers.papacambridge.com/papers/caie/\${msFilename}" target="_blank" rel="noopener" style="color:var(--green);font-weight:700">✅ Mark Scheme (\${msFilename})</a>
+</div>
+<div class="step-block">
+  <div class="step-label">Can't find it?</div>
+  <a href="https://pastpapers.papacambridge.com/" target="_blank" rel="noopener" style="color:var(--green)">Search on PapaCambridge →</a> or <a href="https://www.ilmkidunya.com/papers/" target="_blank" rel="noopener" style="color:var(--green)">ilmkidunya (Pakistani boards) →</a>
+</div>
+<p>Once you have the paper, you can upload it here using the 📷 camera/image button and I'll solve the questions for you!</p>\`;
+    
+    return res.status(200).json({ answer: html });
+  }
+  // ── END PAST PAPER DETECTION ─────────────────────────────
   if (!question && !image) return res.status(400).json({ error: 'No question provided' });
 
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
-  const systemPrompt = `You are StudyGenie, an AI tutor for Pakistani ${level} students studying ${subject}.
+  // Build mode-specific instructions
+  let modeInstructions = '';
+  if (eli5) {
+    modeInstructions = '\n\nIMPORTANT: Explain like the student is 10 years old. Use very simple words, fun analogies, and short sentences. Avoid technical jargon. Use emojis sparingly.';
+  } else if (quickAnswer) {
+    modeInstructions = '\n\nIMPORTANT: Give a QUICK answer only — 3-4 lines max. Just the key point and one brief explanation. No step-by-step.';
+  } else if (mode === 'detailed') {
+    modeInstructions = '\n\nIMPORTANT: Be very detailed and comprehensive. Include extra context, real-world applications, common mistakes to avoid, and exam tips for Pakistani boards.';
+  } else if (mode === 'urdu') {
+    modeInstructions = '\n\nIMPORTANT: Write ALL explanations in Urdu language (Nastaliq script). Keep HTML tags in English but all text content must be in Urdu.';
+  }
+
+  const systemPrompt = `You are StudyGenie, an AI tutor for Pakistani ${level} students studying ${subject}.${modeInstructions}
 
 CRITICAL RULES - YOU MUST FOLLOW THESE EXACTLY:
 1. ONLY output valid HTML. Never use Markdown, never use ## headings, never use ** bold, never use LaTeX or $...$ math notation.
