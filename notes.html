@@ -98,7 +98,11 @@
 <div class="page">
   <div class="page-header">
     <h1>📝 My Notes</h1>
-    <button class="btn-new" onclick="openNewNote()">+ New Note</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn-new" onclick="openNewNote()">+ New Note</button>
+      <button class="btn-new" onclick="exportNotes('html')" style="background:#6366f1">📄 Export HTML</button>
+      <button class="btn-new" onclick="exportNotes('markdown')" style="background:#374151">⬇️ Export MD</button>
+    </div>
   </div>
 
   <div class="search-row">
@@ -165,6 +169,25 @@
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  async function exportNotes(format) {
+    if (!allNotes.length) { showToast('⚠️ No notes to export'); return; }
+    showToast('⏳ Preparing export...');
+    try {
+      const res = await fetch('/api/exportnotes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes: allNotes, format })
+      });
+      const blob = await res.blob();
+      const ext = format === 'markdown' ? 'md' : 'html';
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `studygenie-notes.${ext}`; a.click();
+      URL.revokeObjectURL(url);
+      showToast('✅ Notes exported!');
+    } catch(e) { showToast('❌ Export failed: ' + e.message); }
   }
 
   async function init() {
