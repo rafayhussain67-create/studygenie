@@ -709,15 +709,22 @@
     currentProfile = await getProfile();
     if (currentProfile) {
       plan = currentProfile.plan || 'free';
-      if (currentProfile.level) {
-        // Returning user — show "continue with saved board" prompt
-        lvl = currentProfile.level;
+      // Always show board prompt on login
+      // If they have a saved level → "Continue as X or Change"
+      // If no level → show full board picker
+      const savedLevel = currentProfile.level || localStorage.getItem('sg-level');
+      if (savedLevel) {
+        lvl = savedLevel;
         document.getElementById('level-display-text').textContent = lvl;
         document.getElementById('lvl-label').textContent = lvl;
         updateChips(lvl);
-        setTimeout(() => showBoardConfirm(currentProfile.level), 100);
+        setTimeout(() => showBoardConfirm(savedLevel), 150);
+      } else {
+        // New user — onboarding shows normally
+        setTimeout(() => {
+          document.getElementById('onboarding').classList.remove('hidden');
+        }, 150);
       }
-      // else: new user — onboarding already shows
     }
     await refreshCredits();
     await loadStreakFromDB();
