@@ -985,7 +985,7 @@
       const actionBar = document.createElement('div');
       actionBar.className = 'answer-actions';
       actionBar.innerHTML = `
-        <button class="ans-btn" id="like-${msgId}" onclick="rateAnswer('${msgId}','like')">👍 <span id="like-count-${msgId}">0</span></button>
+        <button class="ans-btn" id="like-${msgId}" onclick="rateAnswer('${msgId}','like')">👍</button>
         <button class="ans-btn" id="dislike-${msgId}" onclick="rateAnswer('${msgId}','dislike')">👎</button>
         <button class="ans-btn" onclick="regenerateAnswer('${msgId}')">🔄 Regenerate</button>
         <button class="ans-btn" onclick="copyAnswer('${msgId}')">📋 Copy</button>
@@ -1462,7 +1462,7 @@
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: 'Translate this explanation to Urdu, keeping the same HTML format with step-block and formula-box divs: ' + text, subject: sub, level: lvl })
+        body: JSON.stringify({ question: 'Translate the following into proper Urdu language using Urdu script (not Roman Urdu). Keep all HTML tags exactly as they are, only translate the visible text content into Urdu script: ' + text, subject: sub, level: lvl })
       });
       const data = await res.json();
       bubble.innerHTML = data.answer || msgOriginals[msgId];
@@ -1738,7 +1738,7 @@
       const newBar = document.createElement('div');
       newBar.className = 'answer-actions';
       newBar.innerHTML = `
-        <button class="ans-btn" id="like-${msgId}" onclick="rateAnswer('${msgId}','like')">👍 <span id="like-count-${msgId}">0</span></button>
+        <button class="ans-btn" id="like-${msgId}" onclick="rateAnswer('${msgId}','like')">👍</button>
         <button class="ans-btn" id="dislike-${msgId}" onclick="rateAnswer('${msgId}','dislike')">👎</button>
         <button class="ans-btn" onclick="regenerateAnswer('${msgId}')">🔄 Regenerate</button>
         <button class="ans-btn" onclick="copyAnswer('${msgId}')">📋 Copy</button>
