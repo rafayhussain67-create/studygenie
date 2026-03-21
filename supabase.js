@@ -2,7 +2,7 @@
 // Load this AFTER the Supabase CDN script in every HTML page
 
 const SUPABASE_URL = 'https://joildbbqsisdoqayfwus.supabase.co';
-const SUPABASE_ANON_KEY = 'PASTE_YOUR_PUBLISHABLE_KEY_HERE';
+const SUPABASE_ANON_KEY = 'sb_publishable_6WADiIvIXFdVLlVuVqVU6w_YAnD8TMO';
 
 // _supa avoids conflict with window.supabase (the CDN library name)
 const _supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
